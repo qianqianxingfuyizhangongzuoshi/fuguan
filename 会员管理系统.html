@@ -558,7 +558,10 @@
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('#adminPage .nav-tab').forEach(t => t.classList.remove('active'));
-            event.target.closest('.nav-tab').classList.add('active');
+            const navTabs = document.querySelectorAll('#adminPage .nav-tab');
+            const tabMap = { 'members': 0, 'addMember': 1, 'addRecord': 2, 'analysis': 3 };
+            const idx = tabMap[tab];
+            if (navTabs[idx]) navTabs[idx].classList.add('active');
             
             const content = document.getElementById('contentArea');
             
@@ -831,33 +834,32 @@
                 autoFillPrice(index);
             }
             
-            // 自动计算金额：盒数 × 单价
+            // 自动计算金额：盒数 × 单价（任一边有变化就重算）
             const row = productRows[index];
             if (field === 'yangsenQty' || field === 'yangsenPrice') {
                 const qty = parseInt(row.yangsenQty) || 0;
                 const price = parseFloat(row.yangsenPrice) || 0;
-                if (price > 0 && qty > 0) {
-                    row.yangsenAmount = qty * price;
-                    const el = document.getElementById(`rowYangsenAmount${index}`);
-                    if (el) el.value = row.yangsenAmount;
-                }
+                row.yangsenAmount = qty * price;
+                const el = document.getElementById(`rowYangsenAmount${index}`);
+                if (el) el.value = row.yangsenAmount;
             }
             if (field === 'yuelaiQty' || field === 'yuelaiPrice') {
                 const qty = parseInt(row.yuelaiQty) || 0;
                 const price = parseFloat(row.yuelaiPrice) || 0;
-                if (price > 0 && qty > 0) {
-                    row.yuelaiAmount = qty * price;
-                    const el = document.getElementById(`rowYuelaiAmount${index}`);
-                    if (el) el.value = row.yuelaiAmount;
-                }
+                row.yuelaiAmount = qty * price;
+                const el = document.getElementById(`rowYuelaiAmount${index}`);
+                if (el) el.value = row.yuelaiAmount;
             }
             
             updateTotalPreview();
         }
         
-        // 自动匹配单价
+        // 自动匹配单价，并自动计算金额
         function autoFillPrice(index) {
-            if (!currentRecordMember) return;
+            if (!currentRecordMember) {
+                alert('请先选择会员！');
+                return;
+            }
             const row = productRows[index];
             const input = (row.product || '').trim();
             if (!input) return;
@@ -878,10 +880,24 @@
                 row.yangsenPrice = YANGSEN_PRICE[ysLevel][matchedName];
                 const priceEl = document.getElementById(`rowYangsenPrice${index}`);
                 if (priceEl) priceEl.value = row.yangsenPrice;
-                // 有养森单价时，清空跃莱单价，避免混淆
-                row.yuelaiPrice = 0;
-                const ylEl = document.getElementById(`rowYuelaiPrice${index}`);
-                if (ylEl) ylEl.value = 0;
+                // 清空跃莱列
+                row.yuelaiPrice = 0; row.yuelaiQty = 0; row.yuelaiAmount = 0;
+                const ylPriceEl = document.getElementById(`rowYuelaiPrice${index}`);
+                const ylQtyEl = document.getElementById(`rowYuelaiQty${index}`);
+                const ylAmtEl = document.getElementById(`rowYuelaiAmount${index}`);
+                if (ylPriceEl) ylPriceEl.value = 0;
+                if (ylQtyEl) ylQtyEl.value = 0;
+                if (ylAmtEl) ylAmtEl.value = 0;
+                // 养森盒数默认1，金额自动算
+                if (row.yangsenQty === 0) {
+                    row.yangsenQty = 1;
+                    const qtyEl = document.getElementById(`rowYangsenQty${index}`);
+                    if (qtyEl) qtyEl.value = 1;
+                }
+                row.yangsenAmount = row.yangsenQty * row.yangsenPrice;
+                const ysAmtEl = document.getElementById(`rowYangsenAmount${index}`);
+                if (ysAmtEl) ysAmtEl.value = row.yangsenAmount;
+                updateTotalPreview();
                 return;
             }
             
@@ -891,10 +907,30 @@
                 row.yuelaiPrice = YUELAI_PRICE[ylLevel][matchedName];
                 const priceEl = document.getElementById(`rowYuelaiPrice${index}`);
                 if (priceEl) priceEl.value = row.yuelaiPrice;
-                // 有跃莱单价时，清空养森单价，避免混淆
-                row.yangsenPrice = 0;
-                const ysEl = document.getElementById(`rowYangsenPrice${index}`);
-                if (ysEl) ysEl.value = 0;
+                // 清空养森列
+                row.yangsenPrice = 0; row.yangsenQty = 0; row.yangsenAmount = 0;
+                const ysPriceEl = document.getElementById(`rowYangsenPrice${index}`);
+                const ysQtyEl = document.getElementById(`rowYangsenQty${index}`);
+                const ysAmtEl = document.getElementById(`rowYangsenAmount${index}`);
+                if (ysPriceEl) ysPriceEl.value = 0;
+                if (ysQtyEl) ysQtyEl.value = 0;
+                if (ysAmtEl) ysAmtEl.value = 0;
+                // 跃莱盒数默认1，金额自动算
+                if (row.yuelaiQty === 0) {
+                    row.yuelaiQty = 1;
+                    const qtyEl = document.getElementById(`rowYuelaiQty${index}`);
+                    if (qtyEl) qtyEl.value = 1;
+                }
+                row.yuelaiAmount = row.yuelaiQty * row.yuelaiPrice;
+                const ylAmtEl = document.getElementById(`rowYuelaiAmount${index}`);
+                if (ylAmtEl) ylAmtEl.value = row.yuelaiAmount;
+                updateTotalPreview();
+                return;
+            }
+            
+            // 匹配到产品名但会员没有对应级别
+            if (!ysLevel && !ylLevel) {
+                alert('会员未设置养森/跃莱级别，请到会员管理设置！');
             }
         }
         
@@ -915,54 +951,59 @@
             }
         }
         
-        // 确认录入（支持多产品）
+        // 确认录入（直接从DOM读值，不依赖JS变量）
         function addRecordFromPage() {
             const memberId = document.getElementById('pageRecordMember').value;
             const date = document.getElementById('pageRecordDate').value;
-            const ticket = document.getElementById('pageRecordTicket').value.trim();
+            const ticket = (document.getElementById('pageRecordTicket') || {}).value || '';
             
             if (!memberId) {
                 alert('请选择会员！');
                 return;
             }
             
-            // 过滤掉空产品行
-            const validRows = productRows.filter(row => 
-                row.product.trim() || row.yangsenQty > 0 || row.yangsenAmount > 0 || row.yuelaiQty > 0 || row.yuelaiAmount > 0
-            );
-            
-            if (validRows.length === 0) {
-                alert('请至少填写一个产品！');
-                return;
-            }
-            
+            // 从DOM直接读取每一行产品的数据
             let addedCount = 0;
-            validRows.forEach(row => {
-                const yangsenAmt = parseFloat(row.yangsenAmount) || 0;
-                const yuelaiAmt = parseFloat(row.yuelaiAmount) || 0;
-                if (yangsenAmt <= 0 && yuelaiAmt <= 0) return; // 金额都为0的跳过
+            for (let i = 0; i < 999; i++) {
+                const productInput = document.getElementById('rowProduct' + i);
+                if (!productInput) break;
+                
+                const product = (productInput.value || '').trim();
+                const ysPrice = parseFloat((document.getElementById('rowYangsenPrice' + i) || {}).value) || 0;
+                const ysQty = parseInt((document.getElementById('rowYangsenQty' + i) || {}).value) || 0;
+                const ysAmt = parseFloat((document.getElementById('rowYangsenAmount' + i) || {}).value) || 0;
+                const ylPrice = parseFloat((document.getElementById('rowYuelaiPrice' + i) || {}).value) || 0;
+                const ylQty = parseInt((document.getElementById('rowYuelaiQty' + i) || {}).value) || 0;
+                const ylAmt = parseFloat((document.getElementById('rowYuelaiAmount' + i) || {}).value) || 0;
+                
+                // 跳过完全空行
+                if (!product && ysAmt === 0 && ylAmt === 0) continue;
                 
                 const record = {
                     id: Date.now() + addedCount,
                     memberId: parseInt(memberId),
                     date: date,
-                    product: row.product.trim() || '产品',
-                    price: parseFloat(row.price) || 0,
-                    yangsenQty: parseInt(row.yangsenQty) || 0,
-                    yuelaiQty: parseInt(row.yuelaiQty) || 0,
-                    yangsenAmount: yangsenAmt,
-                    yuelaiAmount: yuelaiAmt,
+                    product: product || '产品',
+                    price: ysPrice || ylPrice || 0,
+                    yangsenQty: ysQty,
+                    yuelaiQty: ylQty,
+                    yangsenAmount: ysAmt,
+                    yuelaiAmount: ylAmt,
                     ticket: ticket
                 };
                 records.push(record);
                 addedCount++;
-            });
+            }
+            
+            if (addedCount === 0) {
+                alert('请至少填写一个产品的名称和金额！');
+                return;
+            }
             
             localStorage.setItem('fuguan_records', JSON.stringify(records));
-            
             updateStats();
             switchTab('members');
-            alert(`✅ 录入成功！共 ${addedCount} 个产品已保存！`);
+            alert('✅ 录入成功！共 ' + addedCount + ' 个产品已保存！');
         }
         
         // 渲染数据分析
@@ -1271,43 +1312,6 @@
             
             if (currentTab === 'addRecord') renderAddRecord();
             else if (currentTab === 'members') renderMembers();
-            alert('拿货记录添加成功！');
-        }
-        
-        // 添加拿货记录（页面）
-        function addRecordFromPage() {
-            const memberId = document.getElementById('pageRecordMember').value;
-            const yangsenAmt = parseFloat(document.getElementById('pageRecordYangsenAmount').value) || 0;
-            const yuelaiAmt = parseFloat(document.getElementById('pageRecordYuelaiAmount').value) || 0;
-            
-            if (!memberId || (yangsenAmt + yuelaiAmt) <= 0) {
-                alert('请选择会员并输入金额');
-                return;
-            }
-            
-            const record = {
-                id: Date.now(),
-                memberId: parseInt(memberId),
-                date: document.getElementById('pageRecordDate').value,
-                product: document.getElementById('pageRecordProduct').value.trim(),
-                price: parseFloat(document.getElementById('pageRecordPrice').value) || 0,
-                yangsenQty: parseInt(document.getElementById('pageRecordYangsenQty').value) || 0,
-                yuelaiQty: parseInt(document.getElementById('pageRecordYuelaiQty').value) || 0,
-                yangsenAmount: yangsenAmt,
-                yuelaiAmount: yuelaiAmt,
-                ticket: document.getElementById('pageRecordTicket').value.trim()
-            };
-            
-            records.push(record);
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
-            
-            ['pageRecordMember', 'pageRecordProduct', 'pageRecordPrice', 'pageRecordYangsenQty', 'pageRecordYuelaiQty', 'pageRecordYangsenAmount', 'pageRecordYuelaiAmount', 'pageRecordTicket'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = el.type === 'number' ? '0' : '';
-            });
-            
-            updateStats();
-            renderMembers();
             alert('拿货记录添加成功！');
         }
         
