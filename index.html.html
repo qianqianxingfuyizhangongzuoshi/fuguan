@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>倩倩幸福驿站工作室 - 会员管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* 登录页面 */
+        .login-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; }
+        .login-box { background: white; border-radius: 20px; padding: 35px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+        .login-box h1 { color: #333; font-size: 20px; margin-bottom: 8px; }
+        .login-box p { color: #666; font-size: 13px; margin-bottom: 25px; }
+        .login-box input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; text-align: center; margin-bottom: 15px; transition: border-color 0.3s; }
+        .login-box input:focus { outline: none; border-color: #11998e; }
+        .login-box button { width: 100%; padding: 14px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+        .login-box button:hover { transform: scale(1.02); }
+        .login-error { color: #e74c3c; font-size: 13px; margin-top: 12px; display: none; }
+        
+        .login-tabs { display: flex; margin-bottom: 20px; gap: 10px; }
+        .login-tab { flex: 1; padding: 10px; background: #f0f0f0; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; color: #666; transition: all 0.3s; }
+        .login-tab.active { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+        
+        /* 主页面 */
+        .main-page { display: none; }
+        .header { background: white; border-radius: 15px; padding: 12px 15px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; }
+        .header h1 { color: #333; font-size: 16px; margin-bottom: 3px; }
+        .header p { color: #666; font-size: 11px; }
+        .header .user-badge { background: #11998e; color: white; padding: 3px 12px; border-radius: 20px; font-size: 11px; display: inline-block; margin-top: 5px; }
+        
+        /* 统计面板 */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .stat-card { background: white; border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .stat-card .number { font-size: 22px; font-weight: bold; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-card .label { color: #666; font-size: 11px; margin-top: 4px; }
+        .stat-card.warning .number { background: linear-gradient(135deg, #f12711 0%, #f5af19 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* 生日提醒 */
+        .birthday-alert { background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%); color: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .birthday-alert .title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .birthday-alert .names { font-size: 12px; opacity: 0.95; }
+        
+        /* 导航栏 */
+        .nav-tabs { display: flex; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .nav-tab { flex: 1; padding: 10px 3px; text-align: center; cursor: pointer; transition: all 0.3s; font-size: 10px; color: #666; }
+        .nav-tab.active { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+        .nav-tab .icon { font-size: 20px; display: block; margin-bottom: 2px; }
+        
+        /* 内容区 */
+        .content-area { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); min-height: 250px; }
+        .section-title { font-size: 15px; color: #333; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0; }
+        
+        /* 会员卡片 */
+        .member-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
+        .member-card:hover { border-color: #11998e; background: #f8fff8; }
+        .member-card .name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .member-card .name { font-size: 15px; font-weight: bold; color: #333; }
+        .member-card .level { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 2px 8px; border-radius: 15px; font-size: 10px; }
+        .member-card .info-row { font-size: 11px; color: #666; margin-bottom: 4px; }
+        .member-card .stats-row { display: flex; gap: 10px; margin-top: 8px; font-size: 11px; }
+        .member-card .stats-row span { color: #11998e; font-weight: bold; }
+        .member-card .birthday-badge { background: #feca57; color: #333; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 5px; }
+        
+        /* 活跃度标签 */
+        .activity-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 5px; }
+        .activity-tag.active { background: #38ef7d; color: #333; }
+        .activity-tag.normal { background: #74b9ff; color: white; }
+        .activity-tag.dormant { background: #fdcb6e; color: #333; }
+        .activity-tag.lost { background: #e74c3c; color: white; }
+        .activity-tag.new { background: #a29bfe; color: white; }
+        
+        /* 详情页面 */
+        .detail-header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; }
+        .detail-header h2 { font-size: 18px; margin-bottom: 5px; }
+        .detail-header p { font-size: 12px; opacity: 0.9; }
+        .detail-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px; color: #666; margin-bottom: 12px; background: #f8f8f8; padding: 10px; border-radius: 8px; }
+        
+        /* 拿货记录 */
+        .record-item { padding: 10px; border-left: 3px solid #11998e; background: #f8fff8; border-radius: 0 8px 8px 0; margin-bottom: 8px; }
+        .record-item .record-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; color: #999; }
+        .record-item .record-product { font-size: 13px; color: #333; font-weight: bold; margin-bottom: 5px; }
+        .record-item .record-detail { font-size: 11px; color: #666; }
+        .record-item .record-total { font-size: 15px; color: #e74c3c; font-weight: bold; text-align: right; margin-top: 5px; }
+        
+        /* 顾客端页面 */
+        .customer-info-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; text-align: center; }
+        .customer-info-card .phone { font-size: 18px; margin-bottom: 5px; }
+        .customer-info-card .name { font-size: 14px; opacity: 0.9; }
+        .customer-amount-card { background: #fff9e6; padding: 15px; border-radius: 12px; margin-bottom: 12px; }
+        .customer-amount-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 8px; }
+        .customer-amount-row:last-child { font-size: 18px; font-weight: bold; color: #e74c3c; border-top: 1px dashed #ddd; padding-top: 10px; margin-top: 10px; margin-bottom: 0; }
+        
+        /* 分析卡片 */
+        .analysis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .analysis-card { background: #f8f8f8; padding: 12px; border-radius: 10px; text-align: center; }
+        .analysis-card .icon { font-size: 24px; margin-bottom: 5px; }
+        .analysis-card .count { font-size: 24px; font-weight: bold; color: #11998e; }
+        .analysis-card .label { font-size: 11px; color: #666; margin-top: 3px; }
+        
+        /* 表单 */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #333; margin-bottom: 4px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 13px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #11998e; }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; transition: transform 0.2s; }
+        .btn:hover { transform: scale(1.02); }
+        .btn-secondary { background: #f0f0f0; color: #333; margin-top: 8px; }
+        .btn-danger { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); margin-top: 5px; }
+        
+        /* 空状态 */
+        .empty-state { text-align: center; padding: 30px; color: #999; }
+        .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+        
+        /* 弹窗 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 15px; padding: 18px; width: 95%; max-width: 380px; max-height: 85vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .modal-header h3 { color: #333; font-size: 15px; }
+        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #999; }
+        
+        /* 退出按钮 */
+        .logout-btn { display: inline-block; padding: 4px 10px; background: #f0f0f0; color: #666; border-radius: 15px; font-size: 10px; cursor: pointer; margin-top: 5px; }
+        .logout-btn:hover { background: #e0e0e0; }
+        
+        /* 数据备份栏 */
+        .backup-bar { background: white; border-radius: 12px; padding: 12px 15px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .backup-bar .backup-label { font-size: 11px; color: #999; flex: 1; min-width: 60px; }
+        .btn-backup { flex: 1; padding: 8px 10px; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: bold; transition: transform 0.2s; min-width: 80px; }
+        .btn-backup:hover { transform: scale(1.03); }
+        .btn-export { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+        .btn-import { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        
+        /* 统计图表 */
+        .mini-chart { display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 8px; }
+        .mini-chart .bar { width: 20px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 3px 3px 0 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录页面 -->
+        <div class="login-page" id="loginPage">
+            <div class="login-box">
+                <h1>🏠 倩倩幸福驿站工作室</h1>
+                <p>会员产品拿货记录系统</p>
+                
+                <div class="login-tabs">
+                    <button class="login-tab active" onclick="switchLoginTab('admin')">🔐 店主入口</button>
+                    <button class="login-tab" onclick="switchLoginTab('customer')">📱 顾客入口</button>
+                </div>
+                
+                <!-- 店主登录 -->
+                <div id="adminLoginBox">
+                    <input type="password" id="adminPassword" placeholder="请输入店主密码" maxlength="20">
+                    <button onclick="adminLogin()">登 录</button>
+                    <p class="login-error" id="adminError">密码错误，请重新输入</p>
+                </div>
+                
+                <!-- 顾客登录 -->
+                <div id="customerLoginBox" style="display:none;">
+                    <input type="tel" id="customerPhone" placeholder="请输入您的手机号" maxlength="11">
+                    <button onclick="customerLogin()">登 录</button>
+                    <p class="login-error" id="customerError">未找到此手机号，请联系店主添加</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 店主主页面 -->
+        <div class="main-page" id="adminPage">
+            <div class="header">
+                <h1>🏠 倩倩幸福驿站工作室</h1>
+                <p>店主管理后台</p>
+                <span class="user-badge">👑 店主</span>
+                <span class="logout-btn" onclick="logout()">退出登录</span>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="number" id="totalMembers">0</div>
+                    <div class="label">会员总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="totalRecordsNum">0</div>
+                    <div class="label">拿货记录</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="number" id="totalAmount">¥0</div>
+                    <div class="label">累计销售额</div>
+                </div>
+            </div>
+            
+            <!-- 数据备份栏 -->
+            <div class="backup-bar">
+                <span class="backup-label">📦 数据备份</span>
+                <button class="btn-backup btn-export" onclick="exportData()">⬇️ 导出备份</button>
+                <button class="btn-backup btn-import" onclick="document.getElementById('importFileInput').click()">⬆️ 导入恢复</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importData(event)">
+            </div>
+            
+            <!-- 生日提醒 -->
+            <div class="birthday-alert" id="birthdayAlert" style="display:none;">
+                <div class="title">🎂 今日生日提醒</div>
+                <div class="names" id="birthdayNames"></div>
+            </div>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="switchTab('members')"><span class="icon">👥</span>会员列表</div>
+                <div class="nav-tab" onclick="switchTab('addMember')"><span class="icon">➕</span>添加会员</div>
+                <div class="nav-tab" onclick="switchTab('addRecord')"><span class="icon">📦</span>录入拿货</div>
+                <div class="nav-tab" onclick="switchTab('analysis')"><span class="icon">📊</span>数据分析</div>
+            </div>
+            
+            <div class="content-area" id="contentArea"></div>
+        </div>
+        
+        <!-- 顾客页面 -->
+        <div class="main-page" id="customerPage">
+            <div class="header">
+                <h1>🏠 倩倩幸福驿站</h1>
+                <p>欢迎查看您的拿货记录</p>
+                <span class="logout-btn" onclick="logout()">退出登录</span>
+            </div>
+            
+            <div class="content-area" id="customerContent"></div>
+        </div>
+    </div>
+    
+    <!-- 添加会员弹窗 -->
+    <div class="modal" id="addMemberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加新会员</h3>
+                <button class="modal-close" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <div class="form-group"><label>姓名 *</label><input type="text" id="memberName" placeholder="请输入会员姓名"></div>
+            <div class="form-group"><label>手机号 *</label><input type="tel" id="memberPhone" placeholder="请输入手机号" maxlength="11"></div>
+            <div class="form-group"><label>地址</label><input type="text" id="memberAddress" placeholder="请输入住址"></div>
+            <div class="form-group"><label>生日</label><input type="date" id="memberBirthday"></div>
+            <div class="form-row">
+                <div class="form-group"><label>养森团队</label><input type="text" id="memberYangsenTeam" placeholder="养森团队"></div>
+                <div class="form-group"><label>养森级别</label><select id="memberYangsenLevel"><option value="">请选择</option><option value="5盒">5盒级别</option><option value="2箱">2箱级别</option><option value="5箱">5箱级别</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>上级老师</label><input type="text" id="memberTeacher" placeholder="上级老师"></div>
+                <div class="form-group"><label>会员编号</label><input type="text" id="memberNo" placeholder="编号"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>跃莱团队</label><input type="text" id="memberYuelaiTeam" placeholder="跃莱团队"></div>
+                <div class="form-group"><label>跃莱级别</label><select id="memberYuelaiLevel"><option value="">请选择</option><option value="会员价">会员价</option><option value="原价">原价</option></select></div>
+            </div>
+            <button class="btn" onclick="addMember()">添加会员</button>
+            <button class="btn btn-secondary" onclick="closeModal('addMemberModal')">取消</button>
+        </div>
+    </div>
+    
+    <!-- 添加拿货记录弹窗 -->
+    <div class="modal" id="addRecordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📦 录入拿货记录</h3>
+                <button class="modal-close" onclick="closeModal('addRecordModal')">&times;</button>
+            </div>
+            <div class="form-group"><label>选择会员 *</label><select id="recordMember"><option value="">请选择会员</option></select></div>
+            <div class="form-group"><label>时间</label><input type="date" id="recordDate"></div>
+            <div class="form-group"><label>产品名称</label><input type="text" id="recordProduct" placeholder="如：瘦瘦包"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>养森（盒）</label><input type="number" id="recordYangsenQty" placeholder="养森数量" min="0" value="0" onfocus="this.select()"></div>
+                    <div class="form-group"><label>跃莱（盒）</label><input type="number" id="recordYuelaiQty" placeholder="跃莱数量" min="0" value="0" onfocus="this.select()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>养森金额（元）</label><input type="number" id="recordYangsenAmount" placeholder="养森金额" min="0" value="0" onfocus="this.select()"></div>
+                    <div class="form-group"><label>跃莱金额（元）</label><input type="number" id="recordYuelaiAmount" placeholder="跃莱金额" min="0" value="0" onfocus="this.select()"></div>
+                </div>
+            <div class="form-group"><label>票码</label><input type="text" id="recordTicket" placeholder="票据编码"></div>
+            <button class="btn" onclick="addRecord()">确认录入</button>
+            <button class="btn btn-secondary" onclick="closeModal('addRecordModal')">取消</button>
+        </div>
+    </div>
+    
+    <!-- 编辑会员弹窗 -->
+    <div class="modal" id="editMemberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ 编辑会员信息</h3>
+                <button class="modal-close" onclick="closeModal('editMemberModal')">&times;</button>
+            </div>
+            <div class="form-group"><label>姓名 *</label><input type="text" id="editMemberName" placeholder="请输入会员姓名"></div>
+            <div class="form-group"><label>手机号 *</label><input type="tel" id="editMemberPhone" placeholder="请输入手机号" maxlength="11"></div>
+            <div class="form-group"><label>地址</label><input type="text" id="editMemberAddress" placeholder="请输入住址"></div>
+            <div class="form-group"><label>生日</label><input type="date" id="editMemberBirthday"></div>
+            <div class="form-row">
+                <div class="form-group"><label>养森团队</label><input type="text" id="editMemberYangsenTeam" placeholder="养森团队"></div>
+                <div class="form-group"><label>养森级别</label><select id="editMemberYangsenLevel"><option value="">请选择</option><option value="5盒">5盒级别</option><option value="2箱">2箱级别</option><option value="5箱">5箱级别</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>上级老师</label><input type="text" id="editMemberTeacher" placeholder="上级老师"></div>
+                <div class="form-group"><label>会员编号</label><input type="text" id="editMemberNo" placeholder="编号"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>跃莱团队</label><input type="text" id="editMemberYuelaiTeam" placeholder="跃莱团队"></div>
+                <div class="form-group"><label>跃莱级别</label><select id="editMemberYuelaiLevel"><option value="">请选择</option><option value="会员价">会员价</option><option value="原价">原价</option></select></div>
+            </div>
+            <button class="btn" onclick="saveEditMember()">保存修改</button>
+            <button class="btn btn-secondary" onclick="closeModal('editMemberModal')">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 数据初始化
+        const ADMIN_PASSWORD = '696969';
+        
+        // 产品价格对照表（按养森级别 + 产品名称 → 单价元/盒）
+        // 养森系列：10盒/箱；爱飘飘果冻/面膜/酵素锭：20盒/箱；轻清果粉/酵素锭：36盒/箱
+        const YANGSEN_PRICE = {
+            "5盒": {
+                "瘦瘦塑身": 420, "爱巢益生": 338, "活力强盛": 338, "肩颈舒康": 440,
+                "泡泡乐": 140, "紧致精华液": 100,
+                "轻清果粉": 140, "轻清果冻": 140, "酵素液": 225, "胶原蛋白": 225, "酵素锭": 150, "玻色因精华面膜": 42.5, "刺梨酵素液": 210, "益生菌": 140,
+                "俏塑贴": 250, "贴贴瘦": 250, "活力贴": 250, "肩颈贴": 250,
+                "艾养精致套盒": 338, "周末酵素": 120, "咖啡固体饮料": 150, "菌菇味饮料": 150, "抹茶固体饮料": 150, "气血饮": 225,
+                "甘油二酯咖啡固体饮料": 150
+            },
+            "2箱": {
+                "瘦瘦塑身": 320, "爱巢益生": 258, "活力强盛": 258, "肩颈舒康": 340,
+                "泡泡乐": 90, "紧致精华液": 75,
+                "轻清果粉": 90, "轻清果冻": 90, "酵素液": 150, "胶原蛋白": 150, "酵素锭": 100, "玻色因精华面膜": 32.5, "刺梨酵素液": 160, "益生菌": 25,
+                "俏塑贴": 170, "贴贴瘦": 170, "活力贴": 170, "肩颈贴": 170,
+                "艾养精致套盒": 258, "周末酵素": 90, "咖啡固体饮料": 120, "菌菇味饮料": 120, "抹茶固体饮料": 120, "气血饮": 150,
+                "甘油二酯咖啡固体饮料": 120
+            },
+            "5箱": {
+                "瘦瘦塑身": 260, "爱巢益生": 218, "活力强盛": 218, "肩颈舒康": 280,
+                "泡泡乐": 75, "紧致精华液": 65,
+                "轻清果粉": 75, "轻清果冻": 75, "酵素液": 120, "胶原蛋白": 120, "酵素锭": 80, "玻色因精华面膜": 25, "刺梨酵素液": 125, "益生菌": 20.8,
+                "俏塑贴": 135, "贴贴瘦": 135, "活力贴": 135, "肩颈贴": 135,
+                "艾养精致套盒": 218, "周末酵素": 70, "咖啡固体饮料": 100, "菌菇味饮料": 100, "抹茶固体饮料": 100, "气血饮": 120,
+                "甘油二酯咖啡固体饮料": 100
+            }
+        };
+
+        // 跃莱产品价格对照表（按跃莱级别 + 产品名称 → 单价）
+        // 跃莱产品按 原价 / 会员价 两个级别
+        const YUELAI_PRICE = {
+            "会员价": {
+                "复合多肽蛋白质粉": 276, "芦荟矿物粉": 170, "果味高钙复合肽粉": 323, "每日营养粥": 298,
+                "灵芝胶囊": 388, "玉枣阿胶饮": 216, "抑菌粉": 330, "黄精玛咖饮": 216,
+                "百消喷": 24, "生姜洗发水": 72, "香氛沐浴露": 58, "牙膏": 30,
+                "金净原粉": 146, "酸枣核桃饮": 210, "鸸鹋油": 174, "姜根油": 100,
+                "舒痛贴布": 144, "氨糖软骨素钙": 280, "胶原蛋白钙肽粉": 256,
+                "清霏茶萃": 188, "角鲨烯": 396, "三清茶萃": 188, "辅酶Q10": 170,
+                "南极磷虾油": 255, "航帆胶囊": 255, "葛玉肽饮": 170,
+                "复合益生菌粉": 260, "排毒贴": 196, "抗衰老123号": 1275,
+                "七白水光饮": 188, "减止餐": 640, "减止饮": 188,
+                "芦荟凝胶40g": 30, "芦荟凝胶100g": 85
+            },
+            "原价": {
+                "复合多肽蛋白质粉": 318, "芦荟矿物粉": 196, "果味高钙复合肽粉": 380, "每日营养粥": 350,
+                "灵芝胶囊": 456, "玉枣阿胶饮": 248, "抑菌粉": 390, "黄精玛咖饮": 248,
+                "百消喷": 28, "生姜洗发水": 85, "香氛沐浴露": 68, "牙膏": 36,
+                "金净原粉": 165, "酸枣核桃饮": 248, "鸸鹋油": 198, "姜根油": 120,
+                "舒痛贴布": 170, "氨糖软骨素钙": 330, "胶原蛋白钙肽粉": 298,
+                "清霏茶萃": 220, "角鲨烯": 460, "三清茶萃": 220, "辅酶Q10": 200,
+                "南极磷虾油": 288, "航帆胶囊": 300, "葛玉肽饮": 200,
+                "复合益生菌粉": 300, "排毒贴": 225, "抗衰老123号": 1500,
+                "七白水光饮": 220, "减止餐": 750, "减止饮": 220,
+                "芦荟凝胶40g": 35, "芦荟凝胶100g": 100
+            }
+        };
+        
+        // 产品名称模糊匹配映射（用户可能输入的各种叫法 → 标准名称）
+        const PRODUCT_ALIAS = {
+            // 养森
+            "瘦瘦包": "瘦瘦塑身", "瘦瘦": "瘦瘦塑身",
+            "爱巢": "爱巢益生",
+            "活力": "活力强盛",
+            "肩颈": "肩颈舒康",
+            "泡泡": "泡泡乐",
+            "精华液": "紧致精华液", "紧致": "紧致精华液",
+            "果粉": "轻清果粉", "轻清果粉": "轻清果粉",
+            "果冻": "轻清果冻", "轻清果冻": "轻清果冻",
+            "酵素液": "酵素液",
+            "胶原蛋白": "胶原蛋白",
+            "酵素锭": "酵素锭",
+            "面膜": "玻色因精华面膜",
+            "刺梨": "刺梨酵素液",
+            "益生菌": "益生菌",
+            "俏塑": "俏塑贴", "贴贴瘦": "俏塑贴",
+            "活力贴": "活力贴",
+            "肩颈贴": "肩颈贴",
+            "艾养": "艾养精致套盒",
+            "周末酵素": "周末酵素",
+            "咖啡": "甘油二酯咖啡固体饮料", "甘油二酯": "甘油二酯咖啡固体饮料",
+            "菌菇": "菌菇味饮料",
+            "抹茶": "抹茶固体饮料",
+            "气血饮": "气血饮",
+            // 跃莱
+            "蛋白质粉": "复合多肽蛋白质粉", "蛋白粉": "复合多肽蛋白质粉",
+            "芦荟矿物粉": "芦荟矿物粉", "矿物粉": "芦荟矿物粉",
+            "高钙": "果味高钙复合肽粉", "钙粉": "果味高钙复合肽粉",
+            "营养粥": "每日营养粥", "粥": "每日营养粥",
+            "灵芝": "灵芝胶囊",
+            "阿胶饮": "玉枣阿胶饮", "阿胶": "玉枣阿胶饮",
+            "抑菌粉": "抑菌粉",
+            "玛咖饮": "黄精玛咖饮", "玛咖": "黄精玛咖饮",
+            "百消喷": "百消喷",
+            "洗发水": "生姜洗发水", "生姜": "生姜洗发水",
+            "沐浴露": "香氛沐浴露",
+            "牙膏": "牙膏",
+            "金净原": "金净原粉",
+            "酸枣核桃": "酸枣核桃饮",
+            "芦荟凝胶40g": "芦荟凝胶40g", "小凝胶": "芦荟凝胶40g",
+            "芦荟凝胶100g": "芦荟凝胶100g", "大凝胶": "芦荟凝胶100g",
+            "鸸鹋油": "鸸鹋油", "鹃鹊油": "鸸鹋油",
+            "姜根油": "姜根油", "姜根": "姜根油",
+            "舒痛贴": "舒痛贴布", "贴布": "舒痛贴布",
+            "氨糖": "氨糖软骨素钙",
+            "胶原蛋白钙": "胶原蛋白钙肽粉",
+            "清霏": "清霏茶萃",
+            "角鲨烯": "角鲨烯",
+            "三清": "三清茶萃",
+            "辅酶": "辅酶Q10", "Q10": "辅酶Q10",
+            "磷虾油": "南极磷虾油",
+            "航帆": "航帆胶囊", "胶囊": "航帆胶囊",
+            "葛玉": "葛玉肽饮", "肽饮": "葛玉肽饮",
+            "跃莱益生菌": "复合益生菌粉",
+            "跃莱排毒贴": "排毒贴",
+            "跃莱抗衰老": "抗衰老123号", "123号": "抗衰老123号",
+            "七白": "七白水光饮", "水光饮": "七白水光饮",
+            "减止餐": "减止餐", "萸止餐": "减止餐", "减脂餐": "减止餐",
+            "减止饮": "减止饮", "减止": "减止饮"
+        };
+        let members = JSON.parse(localStorage.getItem('fuguan_members')) || [];
+        let records = JSON.parse(localStorage.getItem('fuguan_records')) || [];
+        
+        // 旧数据兼容：把旧的 level 字段迁移到 yangsenLevel
+        members.forEach(m => {
+            if (m.level && !m.yangsenLevel) {
+                m.yangsenLevel = m.level;
+                delete m.level;
+            }
+        });
+        
+        let currentTab = 'members';
+        let loginType = 'admin';
+        let currentCustomerId = null;
+        
+        // 切换登录方式
+        function switchLoginTab(type) {
+            loginType = type;
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('adminLoginBox').style.display = type === 'admin' ? 'block' : 'none';
+            document.getElementById('customerLoginBox').style.display = type === 'customer' ? 'block' : 'none';
+            
+            document.getElementById('adminError').style.display = 'none';
+            document.getElementById('customerError').style.display = 'none';
+        }
+        
+        // 店主登录
+        function adminLogin() {
+            const pwd = document.getElementById('adminPassword').value;
+            if (pwd === ADMIN_PASSWORD) {
+                sessionStorage.setItem('fuguan_admin', 'true');
+                showAdminPage();
+            } else {
+                document.getElementById('adminError').style.display = 'block';
+            }
+        }
+        
+        // 顾客登录
+        function customerLogin() {
+            const phone = document.getElementById('customerPhone').value.trim();
+            const member = members.find(m => m.phone === phone);
+            
+            if (member) {
+                sessionStorage.setItem('fuguan_customer', member.id);
+                currentCustomerId = member.id;
+                showCustomerPage(member);
+            } else {
+                document.getElementById('customerError').style.display = 'block';
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            sessionStorage.removeItem('fuguan_admin');
+            sessionStorage.removeItem('fuguan_customer');
+            document.getElementById('adminPage').style.display = 'none';
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('customerPhone').value = '';
+        }
+        
+        // 显示店主页面
+        function showAdminPage() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'block';
+            document.getElementById('customerPage').style.display = 'none';
+            
+            updateStats();
+            checkBirthday();
+            switchTab('members');
+        }
+        
+        // 显示顾客页面
+        function showCustomerPage(member) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
+            document.getElementById('customerPage').style.display = 'block';
+            
+            renderCustomerView(member);
+        }
+        
+        // 更新统计
+        function updateStats() {
+            document.getElementById('totalMembers').textContent = members.length;
+            document.getElementById('totalRecordsNum').textContent = records.length;
+            
+            const total = records.reduce((sum, r) => sum + parseFloat(r.yangsenAmount || 0) + parseFloat(r.yuelaiAmount || 0), 0);
+            document.getElementById('totalAmount').textContent = '¥' + Math.round(total);
+        }
+        
+        // 检查生日
+        function checkBirthday() {
+            const today = new Date();
+            const todayMonth = today.getMonth() + 1;
+            const todayDay = today.getDate();
+            
+            const birthdayMembers = members.filter(m => {
+                if (!m.birthday) return false;
+                const bDate = new Date(m.birthday);
+                return bDate.getMonth() + 1 === todayMonth && bDate.getDate() === todayDay;
+            });
+            
+            const alertDiv = document.getElementById('birthdayAlert');
+            const namesDiv = document.getElementById('birthdayNames');
+            
+            if (birthdayMembers.length > 0) {
+                alertDiv.style.display = 'block';
+                namesDiv.textContent = birthdayMembers.map(m => m.name).join('、') + ' 🎉';
+            } else {
+                alertDiv.style.display = 'none';
+            }
+        }
+        
+        // 切换标签
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('#adminPage .nav-tab').forEach(t => t.classList.remove('active'));
+            const navTabs = document.querySelectorAll('#adminPage .nav-tab');
+            const tabMap = { 'members': 0, 'addMember': 1, 'addRecord': 2, 'analysis': 3 };
+            const idx = tabMap[tab];
+            if (navTabs[idx]) navTabs[idx].classList.add('active');
+            
+            const content = document.getElementById('contentArea');
+            
+            switch(tab) {
+                case 'members': renderMembers(); break;
+                case 'addMember': renderAddMember(); break;
+                case 'addRecord': renderAddRecord(); break;
+                case 'analysis': renderAnalysis(); break;
+            }
+        }
+        
+        // 计算活跃度（流失：70天没拿货）
+        function getActivityStatus(member) {
+            const memberRecords = records.filter(r => r.memberId === member.id);
+            if (memberRecords.length === 0) return 'lost';
+            
+            const lastRecord = memberRecords.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+            const lastDate = new Date(lastRecord.date);
+            const now = new Date();
+            const daysSince = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+            
+            // 加入时间判断
+            const joinDate = new Date(member.createdAt);
+            const daysSinceJoin = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24));
+            
+            if (daysSinceJoin <= 30) return 'new';
+            if (daysSince <= 30) return 'active';
+            if (daysSince <= 70) return 'normal';
+            if (daysSince <= 120) return 'dormant';
+            return 'lost';
+        }
+        
+        // 获取活跃度标签
+        function getActivityLabel(status) {
+            const labels = {
+                new: { text: '新加入', class: 'new' },
+                active: { text: '活跃', class: 'active' },
+                normal: { text: '正常', class: 'normal' },
+                dormant: { text: '沉睡', class: 'dormant' },
+                lost: { text: '流失', class: 'lost' }
+            };
+            const l = labels[status] || labels['normal'];
+            return `<span class="activity-tag ${l.class}">${l.text}</span>`;
+        }
+        
+        // 渲染会员列表
+        function renderMembers() {
+            const content = document.getElementById('contentArea');
+            let html = `
+                <div class="section-title">👥 会员列表（共${members.length}人）</div>
+                <button class="btn" onclick="openModal('addMemberModal')" style="margin-bottom: 12px;">+ 添加新会员</button>
+            `;
+            
+            if (members.length === 0) {
+                html += `<div class="empty-state"><div class="icon">👥</div><p>暂无会员<br>点击上方按钮添加</p></div>`;
+            } else {
+                members.forEach((m, index) => {
+                    const memberRecords = records.filter(r => r.memberId === m.id);
+                    const total = memberRecords.reduce((sum, r) => sum + parseFloat(r.yangsenAmount || 0) + parseFloat(r.yuelaiAmount || 0), 0);
+                    const activity = getActivityStatus(m);
+                    const birthdayBadge = m.birthday ? `<span class="birthday-badge">🎂 ${m.birthday.slice(5)}</span>` : '';
+                    
+                    html += `
+                        <div class="member-card" onclick="viewMember(${index})">
+                            <div class="name-row">
+                                <span class="name">${m.name} ${getActivityLabel(activity)}</span>
+                                <span class="level">${m.level || '会员'}</span>
+                            </div>
+                            <div class="info-row">📱 ${m.phone || '无电话'} ${birthdayBadge}</div>
+                            <div class="info-row">🌿 ${m.yangsenTeam || '-'} | 🏅 ${m.yuelaiTeam || '-'}</div>
+                            <div class="stats-row">
+                                <span>拿货 ${memberRecords.length} 次</span>
+                                <span>累计 ¥${Math.round(total)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            content.innerHTML = html;
+        }
+        
+        // 查看会员详情
+        function viewMember(index) {
+            const member = members[index];
+            const memberRecords = records.filter(r => r.memberId === member.id);
+            memberRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const yangsenTotal = memberRecords.reduce((sum, r) => sum + parseFloat(r.yangsenAmount || 0), 0);
+            const yuelaiTotal = memberRecords.reduce((sum, r) => sum + parseFloat(r.yuelaiAmount || 0), 0);
+            const totalAll = yangsenTotal + yuelaiTotal;
+            const activity = getActivityStatus(member);
+            
+            const content = document.getElementById('contentArea');
+            
+            let html = `
+                <div class="section-title" style="cursor:pointer" onclick="renderMembers()">← 返回会员列表</div>
+                
+                <div class="detail-header">
+                    <h2>${member.name} ${getActivityLabel(activity)}</h2>
+                    <p>${member.level ? '会员级别：' + member.level : ''}</p>
+                </div>
+                
+                <div class="detail-info">
+                    <div>📱 ${member.phone || '未填写'}</div>
+                    <div>🎂 ${member.birthday || '未填写'}</div>
+                    <div>📍 ${member.address || '未填写'}</div>
+                    <div>🏷️ ${member.no || '未填写'}</div>
+                    <div>🌿 养森：${member.yangsenTeam || '未填写'}</div>
+                    <div>🏅 跃莱：${member.yuelaiTeam || '未填写'}</div>
+                    <div>👨‍🏫 上级：${member.teacher || '未填写'}</div>
+                    <div>📅 加入：${formatDate(member.createdAt)}</div>
+                </div>
+                
+                <div class="detail-info" style="background:#fff9e6;">
+                    <div style="color:#e74c3c;">🌿 养森 ¥${Math.round(yangsenTotal)}</div>
+                    <div style="color:#0984e3;">🏅 跃莱 ¥${Math.round(yuelaiTotal)}</div>
+                    <div style="font-size:14px;font-weight:bold;color:#e74c3c;grid-column:span 2;">💰 累计拿货 ¥${Math.round(totalAll)}</div>
+                </div>
+                
+                <div class="section-title">📦 拿货记录（${memberRecords.length}条）</div>
+            `;
+            
+            if (memberRecords.length === 0) {
+                html += '<p style="color:#999;font-size:12px;">暂无拿货记录</p>';
+            } else {
+                memberRecords.forEach((r, i) => {
+                    const rTotal = parseFloat(r.yangsenAmount || 0) + parseFloat(r.yuelaiAmount || 0);
+                    html += `
+                        <div class="record-item">
+                            <div class="record-header"><span>${formatDate(r.date)}</span><span>#${memberRecords.length - i}</span></div>
+                            <div class="record-product">${r.product || '产品'}</div>
+                            <div class="record-detail">
+                                🌿养森：${r.yangsenQty || 0}盒 ¥${parseFloat(r.yangsenAmount || 0).toFixed(0)}
+                                | 🏅跃莱：${r.yuelaiQty || 0}盒 ¥${parseFloat(r.yuelaiAmount || 0).toFixed(0)}
+                            </div>
+                            <div class="record-total">¥${rTotal.toFixed(0)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `<button class="btn btn-danger" onclick="deleteMember(${index})" style="margin-top:12px;">🗑️ 删除此会员</button>
+            <button class="btn btn-secondary" onclick="openEditMember(${index})" style="margin-top:8px;">✏️ 编辑信息</button>`;
+            
+            content.innerHTML = html;
+        }
+        
+        // 渲染添加会员页面
+        function renderAddMember() {
+            const content = document.getElementById('contentArea');
+            content.innerHTML = `
+                <div class="section-title">➕ 添加新会员</div>
+                <div class="form-group"><label>姓名 *</label><input type="text" id="pageMemberName" placeholder="请输入会员姓名"></div>
+                <div class="form-group"><label>手机号 *</label><input type="tel" id="pageMemberPhone" placeholder="请输入手机号" maxlength="11"></div>
+                <div class="form-group"><label>地址</label><input type="text" id="pageMemberAddress" placeholder="请输入住址"></div>
+                <div class="form-group"><label>生日</label><input type="date" id="pageMemberBirthday"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>养森团队</label><input type="text" id="pageMemberYangsenTeam" placeholder="养森团队"></div>
+                    <div class="form-group"><label>养森级别</label><select id="pageMemberYangsenLevel"><option value="">请选择</option><option value="5盒">5盒级别</option><option value="2箱">2箱级别</option><option value="5箱">5箱级别</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>上级老师</label><input type="text" id="pageMemberTeacher" placeholder="上级老师"></div>
+                    <div class="form-group"><label>会员编号</label><input type="text" id="pageMemberNo" placeholder="编号"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>跃莱团队</label><input type="text" id="pageMemberYuelaiTeam" placeholder="跃莱团队"></div>
+                    <div class="form-group"><label>跃莱级别</label><select id="pageMemberYuelaiLevel"><option value="">请选择</option><option value="会员价">会员价</option><option value="原价">原价</option></select></div>
+                </div>
+                <button class="btn" onclick="addMemberFromPage()">添加会员</button>
+            `;
+        }
+        
+        // 渲染录入拿货页面
+        let productRows = []; // 动态产品行数据
+        let currentRecordMember = null; // 当前录入页面选中的会员对象
+        
+        function renderAddRecord() {
+            const content = document.getElementById('contentArea');
+            let html = `<div class="section-title">📦 录入拿货记录</div>`;
+            
+            if (members.length === 0) {
+                html += `<div class="empty-state"><div class="icon">👥</div><p>请先添加会员</p></div>`;
+                content.innerHTML = html;
+                return;
+            }
+            
+            // 重置产品行，初始一行
+            productRows = [{product: '', yangsenPrice: 0, yangsenQty: 0, yangsenAmount: 0, yuelaiPrice: 0, yuelaiQty: 0, yuelaiAmount: 0}];
+            
+            html += `
+                <div class="form-group"><label>选择会员 *</label><select id="pageRecordMember" onchange="onRecordMemberChange()"><option value="">请选择会员</option>${members.map(m => `<option value="${m.id}">${m.name} (${m.phone || '无电话'})</option>`).join('')}</select></div>
+                <div class="form-group"><label>时间</label><input type="date" id="pageRecordDate" value="${new Date().toISOString().split('T')[0]}"></div>
+                
+                <div class="section-title" style="font-size:13px;">🛍️ 产品明细</div>
+                <div id="productRowsContainer"></div>
+                <button class="btn btn-secondary" onclick="addProductRow()" style="margin-top:6px;margin-bottom:8px;">+ 再加一个产品</button>
+                
+                <div class="form-group"><label>票码</label><input type="text" id="pageRecordTicket" placeholder="票据编码"></div>
+                <div id="totalPreview" style="background:#fff9e6;border-radius:8px;padding:10px;text-align:center;font-size:16px;font-weight:bold;color:#e74c3c;margin-bottom:10px;display:none;">💰 本次合计：¥<span id="totalPreviewNum">0</span></div>
+                <button class="btn" onclick="addRecordFromPage()">✅ 确认录入（可一次性录多个产品）</button>
+            `;
+            
+            content.innerHTML = html;
+            renderProductRows();
+        }
+        
+        // 渲染产品行
+        function renderProductRows() {
+            const container = document.getElementById('productRowsContainer');
+            if (!container) return;
+            
+            let html = '';
+            productRows.forEach((row, i) => {
+                html += `
+                    <div style="background:#f8f8f8;border-radius:10px;padding:10px;margin-bottom:8px;position:relative;">
+                        <div style="font-size:11px;color:#999;margin-bottom:6px;">产品 ${i + 1} ${i > 0 ? `<span onclick="removeProductRow(${i})" style="color:#e74c3c;cursor:pointer;float:right;">🗑️ 删除</span>` : ''}</div>
+                        <div class="form-group" style="margin-bottom:6px;"><label>产品名称</label><input type="text" id="rowProduct${i}" value="${row.product}" placeholder="如：瘦瘦包 / 轻清果冻" oninput="updateRow(${i}, 'product', this.value)"></div>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom:6px;"><label style="font-size:11px;color:#666;">养森单价（元/盒）</label><input type="number" id="rowYangsenPrice${i}" value="${row.yangsenPrice}" min="0" onfocus="this.select()" oninput="updateRow(${i}, 'yangsenPrice', this.value)"></div>
+                            <div class="form-group" style="margin-bottom:6px;"><label style="font-size:11px;color:#666;">跃莱单价（元/盒）</label><input type="number" id="rowYuelaiPrice${i}" value="${row.yuelaiPrice}" min="0" onfocus="this.select()" oninput="updateRow(${i}, 'yuelaiPrice', this.value)"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom:6px;"><label>养森（盒）</label><input type="number" id="rowYangsenQty${i}" value="${row.yangsenQty}" min="0" onfocus="this.select()" oninput="updateRow(${i}, 'yangsenQty', this.value)"></div>
+                            <div class="form-group" style="margin-bottom:6px;"><label>跃莱（盒）</label><input type="number" id="rowYuelaiQty${i}" value="${row.yuelaiQty}" min="0" onfocus="this.select()" oninput="updateRow(${i}, 'yuelaiQty', this.value)"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom:6px;"><label>养森金额（元）</label><input type="number" id="rowYangsenAmount${i}" value="${row.yangsenAmount}" min="0" onfocus="this.select()" oninput="updateRow(${i}, 'yangsenAmount', this.value)"></div>
+                            <div class="form-group" style="margin-bottom:6px;"><label>跃莱金额（元）</label><input type="number" id="rowYuelaiAmount${i}" value="${row.yuelaiAmount}" min="0" onfocus="this.select()" oninput="updateRow(${i}, 'yuelaiAmount', this.value)"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            updateTotalPreview();
+        }
+        
+        // 会员选择改变时，记录当前会员的级别
+        function onRecordMemberChange() {
+            const memberId = parseInt(document.getElementById('pageRecordMember').value);
+            currentRecordMember = members.find(m => m.id === memberId) || null;
+        }
+        
+        // 添加产品行
+        function addProductRow() {
+            productRows.push({product: '', yangsenPrice: 0, yangsenQty: 0, yangsenAmount: 0, yuelaiPrice: 0, yuelaiQty: 0, yuelaiAmount: 0});
+            renderProductRows();
+        }
+        
+        // 删除产品行
+        function removeProductRow(index) {
+            if (productRows.length <= 1) {
+                alert('至少要保留一个产品！');
+                return;
+            }
+            productRows.splice(index, 1);
+            renderProductRows();
+        }
+        
+        // 更新行数据
+        function updateRow(index, field, value) {
+            if (['yangsenPrice', 'yangsenQty', 'yangsenAmount', 'yuelaiPrice', 'yuelaiQty', 'yuelaiAmount'].includes(field)) {
+                productRows[index][field] = parseFloat(value) || 0;
+            } else {
+                productRows[index][field] = value;
+            }
+            
+            // 输入产品名称时，自动匹配单价
+            if (field === 'product') {
+                autoFillPrice(index);
+            }
+            
+            // 自动计算金额：盒数 × 单价（任一边有变化就重算）
+            const row = productRows[index];
+            if (field === 'yangsenQty' || field === 'yangsenPrice') {
+                const qty = parseInt(row.yangsenQty) || 0;
+                const price = parseFloat(row.yangsenPrice) || 0;
+                row.yangsenAmount = qty * price;
+                const el = document.getElementById(`rowYangsenAmount${index}`);
+                if (el) el.value = row.yangsenAmount;
+            }
+            if (field === 'yuelaiQty' || field === 'yuelaiPrice') {
+                const qty = parseInt(row.yuelaiQty) || 0;
+                const price = parseFloat(row.yuelaiPrice) || 0;
+                row.yuelaiAmount = qty * price;
+                const el = document.getElementById(`rowYuelaiAmount${index}`);
+                if (el) el.value = row.yuelaiAmount;
+            }
+            
+            updateTotalPreview();
+        }
+        
+        // 自动匹配单价，并自动计算金额
+        function autoFillPrice(index) {
+            if (!currentRecordMember) {
+                alert('请先选择会员！');
+                return;
+            }
+            const row = productRows[index];
+            const input = (row.product || '').trim();
+            if (!input) return;
+            
+            // 模糊匹配产品名称
+            let matchedName = null;
+            for (const [alias, name] of Object.entries(PRODUCT_ALIAS)) {
+                if (input.includes(alias) || alias.includes(input)) {
+                    matchedName = name;
+                    break;
+                }
+            }
+            if (!matchedName) return;
+            
+            // 根据会员养森级别匹配养森单价
+            const ysLevel = currentRecordMember.yangsenLevel;
+            if (ysLevel && YANGSEN_PRICE[ysLevel] && YANGSEN_PRICE[ysLevel][matchedName]) {
+                row.yangsenPrice = YANGSEN_PRICE[ysLevel][matchedName];
+                const priceEl = document.getElementById(`rowYangsenPrice${index}`);
+                if (priceEl) priceEl.value = row.yangsenPrice;
+                // 清空跃莱列
+                row.yuelaiPrice = 0; row.yuelaiQty = 0; row.yuelaiAmount = 0;
+                const ylPriceEl = document.getElementById(`rowYuelaiPrice${index}`);
+                const ylQtyEl = document.getElementById(`rowYuelaiQty${index}`);
+                const ylAmtEl = document.getElementById(`rowYuelaiAmount${index}`);
+                if (ylPriceEl) ylPriceEl.value = 0;
+                if (ylQtyEl) ylQtyEl.value = 0;
+                if (ylAmtEl) ylAmtEl.value = 0;
+                // 养森盒数默认1，金额自动算
+                if (row.yangsenQty === 0) {
+                    row.yangsenQty = 1;
+                    const qtyEl = document.getElementById(`rowYangsenQty${index}`);
+                    if (qtyEl) qtyEl.value = 1;
+                }
+                row.yangsenAmount = row.yangsenQty * row.yangsenPrice;
+                const ysAmtEl = document.getElementById(`rowYangsenAmount${index}`);
+                if (ysAmtEl) ysAmtEl.value = row.yangsenAmount;
+                updateTotalPreview();
+                return;
+            }
+            
+            // 根据会员跃莱级别匹配跃莱单价
+            const ylLevel = currentRecordMember.yuelaiLevel;
+            if (ylLevel && YUELAI_PRICE[ylLevel] && YUELAI_PRICE[ylLevel][matchedName]) {
+                row.yuelaiPrice = YUELAI_PRICE[ylLevel][matchedName];
+                const priceEl = document.getElementById(`rowYuelaiPrice${index}`);
+                if (priceEl) priceEl.value = row.yuelaiPrice;
+                // 清空养森列
+                row.yangsenPrice = 0; row.yangsenQty = 0; row.yangsenAmount = 0;
+                const ysPriceEl = document.getElementById(`rowYangsenPrice${index}`);
+                const ysQtyEl = document.getElementById(`rowYangsenQty${index}`);
+                const ysAmtEl = document.getElementById(`rowYangsenAmount${index}`);
+                if (ysPriceEl) ysPriceEl.value = 0;
+                if (ysQtyEl) ysQtyEl.value = 0;
+                if (ysAmtEl) ysAmtEl.value = 0;
+                // 跃莱盒数默认1，金额自动算
+                if (row.yuelaiQty === 0) {
+                    row.yuelaiQty = 1;
+                    const qtyEl = document.getElementById(`rowYuelaiQty${index}`);
+                    if (qtyEl) qtyEl.value = 1;
+                }
+                row.yuelaiAmount = row.yuelaiQty * row.yuelaiPrice;
+                const ylAmtEl = document.getElementById(`rowYuelaiAmount${index}`);
+                if (ylAmtEl) ylAmtEl.value = row.yuelaiAmount;
+                updateTotalPreview();
+                return;
+            }
+            
+            // 匹配到产品名但会员没有对应级别
+            if (!ysLevel && !ylLevel) {
+                alert('会员未设置养森/跃莱级别，请到会员管理设置！');
+            }
+        }
+        
+        // 更新合计预览
+        function updateTotalPreview() {
+            const total = productRows.reduce((sum, row) => {
+                return sum + (parseFloat(row.yangsenAmount) || 0) + (parseFloat(row.yuelaiAmount) || 0);
+            }, 0);
+            const previewDiv = document.getElementById('totalPreview');
+            const previewNum = document.getElementById('totalPreviewNum');
+            if (previewDiv && previewNum) {
+                if (total > 0) {
+                    previewDiv.style.display = 'block';
+                    previewNum.textContent = Math.round(total);
+                } else {
+                    previewDiv.style.display = 'none';
+                }
+            }
+        }
+        
+        // 确认录入（直接从DOM读值，不依赖JS变量）
+        function addRecordFromPage() {
+            const memberId = document.getElementById('pageRecordMember').value;
+            const date = document.getElementById('pageRecordDate').value;
+            const ticket = (document.getElementById('pageRecordTicket') || {}).value || '';
+            
+            if (!memberId) {
+                alert('请选择会员！');
+                return;
+            }
+            
+            // 从DOM直接读取每一行产品的数据
+            let addedCount = 0;
+            for (let i = 0; i < 999; i++) {
+                const productInput = document.getElementById('rowProduct' + i);
+                if (!productInput) break;
+                
+                const product = (productInput.value || '').trim();
+                const ysPrice = parseFloat((document.getElementById('rowYangsenPrice' + i) || {}).value) || 0;
+                const ysQty = parseInt((document.getElementById('rowYangsenQty' + i) || {}).value) || 0;
+                const ysAmt = parseFloat((document.getElementById('rowYangsenAmount' + i) || {}).value) || 0;
+                const ylPrice = parseFloat((document.getElementById('rowYuelaiPrice' + i) || {}).value) || 0;
+                const ylQty = parseInt((document.getElementById('rowYuelaiQty' + i) || {}).value) || 0;
+                const ylAmt = parseFloat((document.getElementById('rowYuelaiAmount' + i) || {}).value) || 0;
+                
+                // 跳过完全空行
+                if (!product && ysAmt === 0 && ylAmt === 0) continue;
+                
+                const record = {
+                    id: Date.now() + addedCount,
+                    memberId: parseInt(memberId),
+                    date: date,
+                    product: product || '产品',
+                    price: ysPrice || ylPrice || 0,
+                    yangsenQty: ysQty,
+                    yuelaiQty: ylQty,
+                    yangsenAmount: ysAmt,
+                    yuelaiAmount: ylAmt,
+                    ticket: ticket
+                };
+                records.push(record);
+                addedCount++;
+            }
+            
+            if (addedCount === 0) {
+                alert('请至少填写一个产品的名称和金额！');
+                return;
+            }
+            
+            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            updateStats();
+            switchTab('members');
+            alert('✅ 录入成功！共 ' + addedCount + ' 个产品已保存！');
+        }
+        
+        // 渲染数据分析
+        function renderAnalysis() {
+            const content = document.getElementById('contentArea');
+            
+            // 活跃度统计
+            const statusCount = { new: 0, active: 0, normal: 0, dormant: 0, lost: 0 };
+            members.forEach(m => {
+                const status = getActivityStatus(m);
+                statusCount[status]++;
+            });
+            
+            // 本月新增
+            const now = new Date();
+            const thisMonth = now.getMonth() + 1;
+            const thisYear = now.getFullYear();
+            const newThisMonth = members.filter(m => {
+                const d = new Date(m.createdAt);
+                return d.getMonth() + 1 === thisMonth && d.getFullYear() === thisYear;
+            }).length;
+            
+            // 本月销售额
+            const monthRecords = records.filter(r => {
+                const d = new Date(r.date);
+                return d.getMonth() + 1 === thisMonth && d.getFullYear() === thisYear;
+            });
+            const monthTotal = monthRecords.reduce((sum, r) => sum + parseFloat(r.yangsenAmount || 0) + parseFloat(r.yuelaiAmount || 0), 0);
+            
+            // 即将生日（7天内）
+            const upcomingBirthday = members.filter(m => {
+                if (!m.birthday) return false;
+                const bDate = new Date(m.birthday);
+                const thisYearBirthday = new Date(thisYear, bDate.getMonth(), bDate.getDate());
+                const diffDays = Math.floor((thisYearBirthday - now) / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 7;
+            });
+            
+            let html = `
+                <div class="section-title">📊 顾客会员分析</div>
+                
+                <div class="analysis-grid">
+                    <div class="analysis-card"><div class="icon">🆕</div><div class="count">${newThisMonth}</div><div class="label">本月新增</div></div>
+                    <div class="analysis-card"><div class="icon">📦</div><div class="count">${monthRecords.length}</div><div class="label">本月订单</div></div>
+                    <div class="analysis-card"><div class="icon">💰</div><div class="count">¥${Math.round(monthTotal)}</div><div class="label">本月销售</div></div>
+                    <div class="analysis-card"><div class="icon">🎂</div><div class="count">${upcomingBirthday.length}</div><div class="label">7天内生日</div></div>
+                </div>
+                
+                <div class="section-title">👥 活跃度分布</div>
+                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;">
+                    <div style="padding:10px;background:#a29bfe;border-radius:8px;">
+                        <div style="font-size:16px;font-weight:bold;">${statusCount.new}</div>
+                        <div style="font-size:10px;color:#fff;">新加入</div>
+                    </div>
+                    <div style="padding:10px;background:#38ef7d;border-radius:8px;">
+                        <div style="font-size:16px;font-weight:bold;">${statusCount.active}</div>
+                        <div style="font-size:10px;color:#333;">活跃</div>
+                    </div>
+                    <div style="padding:10px;background:#74b9ff;border-radius:8px;">
+                        <div style="font-size:16px;font-weight:bold;">${statusCount.normal}</div>
+                        <div style="font-size:10px;color:#fff;">正常</div>
+                    </div>
+                    <div style="padding:10px;background:#fdcb6e;border-radius:8px;">
+                        <div style="font-size:16px;font-weight:bold;">${statusCount.dormant}</div>
+                        <div style="font-size:10px;color:#333;">沉睡</div>
+                    </div>
+                    <div style="padding:10px;background:#e74c3c;border-radius:8px;">
+                        <div style="font-size:16px;font-weight:bold;">${statusCount.lost}</div>
+                        <div style="font-size:10px;color:#fff;">流失</div>
+                    </div>
+                </div>
+            `;
+            
+            if (upcomingBirthday.length > 0) {
+                html += `
+                    <div class="section-title">🎂 即将生日（7天内）</div>
+                    ${upcomingBirthday.map(m => `
+                        <div class="member-card" style="cursor:default;">
+                            <div class="name-row">
+                                <span class="name">${m.name}</span>
+                                <span class="birthday-badge">🎂 ${m.birthday.slice(5)}</span>
+                            </div>
+                            <div class="info-row">📱 ${m.phone || '无电话'}</div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            content.innerHTML = html;
+        }
+        
+        // 渲染顾客端页面（只显示：生日、电话、上级老师、产品名称）
+        function renderCustomerView(member) {
+            const content = document.getElementById('customerContent');
+            const memberRecords = records.filter(r => r.memberId === member.id);
+            memberRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // 生日祝福
+            let birthdayHtml = '';
+            if (member.birthday) {
+                const today = new Date();
+                const bDate = new Date(member.birthday);
+                const thisYearBirthday = new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate());
+                const diffDays = Math.floor((thisYearBirthday - today) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                    birthdayHtml = `
+                        <div class="birthday-alert">
+                            <div class="title">🎂 ${member.name}，生日快乐！</div>
+                            <div class="names">🎉 倩倩祝你生日快乐，万事如意！🎉</div>
+                        </div>
+                    `;
+                } else if (diffDays > 0 && diffDays <= 7) {
+                    birthdayHtml = `
+                        <div class="birthday-alert">
+                            <div class="title">🎂 生日快到啦！</div>
+                            <div class="names">还有 ${diffDays} 天就是你的生日，提前祝你生日快乐！</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // 获取所有产品名称（去重）
+            const products = [...new Set(memberRecords.map(r => r.product).filter(p => p))];
+            
+            // 计算养森和跃莱分开累计
+            const yangsenTotal = memberRecords.reduce((sum, r) => sum + parseFloat(r.yangsenAmount || 0), 0);
+            const yuelaiTotal = memberRecords.reduce((sum, r) => sum + parseFloat(r.yuelaiAmount || 0), 0);
+            const totalAll = yangsenTotal + yuelaiTotal;
+            
+            let html = birthdayHtml + `
+                <div class="section-title">👤 个人信息</div>
+                <div class="detail-info" style="background:#f8f8ff;">
+                    <div>📱 电话：${member.phone || '未填写'}</div>
+                    <div>🎂 生日：${member.birthday || '未填写'}</div>
+                    <div>👨‍🏫 上级老师：${member.teacher || '未填写'}</div>
+                    <div>🏪 养森团队：${member.yangsenTeam || '未填写'}</div>
+                    <div>📋 养森级别：${member.yangsenLevel || '未设置'}</div>
+                    <div>🏅 跃莱团队：${member.yuelaiTeam || '未填写'}</div>
+                    <div>📋 跃莱级别：${member.yuelaiLevel || '未设置'}</div>
+                </div>
+                
+                <div class="section-title">💰 消费累计</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;">
+                    <div style="background:linear-gradient(135deg,#f12711,#f5af19);padding:15px;border-radius:10px;text-align:center;color:white;">
+                        <div style="font-size:12px;opacity:0.9;">🌿 养森</div>
+                        <div style="font-size:18px;font-weight:bold;">¥${Math.round(yangsenTotal)}</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#4facfe,#00f2fe);padding:15px;border-radius:10px;text-align:center;color:white;">
+                        <div style="font-size:12px;opacity:0.9;">🏅 跃莱</div>
+                        <div style="font-size:18px;font-weight:bold;">¥${Math.round(yuelaiTotal)}</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#11998e,#38ef7d);padding:15px;border-radius:10px;text-align:center;color:white;">
+                        <div style="font-size:12px;opacity:0.9;">💰 合计</div>
+                        <div style="font-size:18px;font-weight:bold;">¥${Math.round(totalAll)}</div>
+                    </div>
+                </div>
+                
+                <div class="section-title">📦 已购产品（共${memberRecords.length}条记录）</div>
+            `;
+            
+            if (products.length > 0) {
+                html += `
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;">
+                        ${products.map(p => `<span style="background:linear-gradient(135deg,#11998e,#38ef7d);color:white;padding:8px 15px;border-radius:20px;font-size:12px;">${p}</span>`).join('')}
+                    </div>
+                `;
+            }
+            
+            html += `<div class="section-title">📋 产品拿货明细</div>`;
+            
+            if (memberRecords.length === 0) {
+                html += '<div class="empty-state"><div class="icon">📦</div><p>暂无拿货记录</p></div>';
+            } else {
+                memberRecords.forEach((r, i) => {
+                    html += `
+                        <div class="record-item">
+                            <div class="record-header"><span>${formatDate(r.date)}</span><span>#${memberRecords.length - i}</span></div>
+                            <div class="record-product">${r.product || '产品'}</div>
+                            <div class="record-detail">
+                                🌿养森：${r.yangsenQty || 0}盒 ¥${parseFloat(r.yangsenAmount || 0).toFixed(0)}
+                                | 🏅跃莱：${r.yuelaiQty || 0}盒 ¥${parseFloat(r.yuelaiAmount || 0).toFixed(0)}
+                            </div>
+                            <div class="record-total">¥${(parseFloat(r.yangsenAmount || 0) + parseFloat(r.yuelaiAmount || 0)).toFixed(0)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            content.innerHTML = html;
+        }
+        
+        // 添加会员（弹窗）
+        function addMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+            
+            if (!name || !phone) {
+                alert('请输入姓名和手机号');
+                return;
+            }
+            
+            // 检查手机号是否已存在
+            if (members.find(m => m.phone === phone)) {
+                alert('此手机号已存在！');
+                return;
+            }
+            
+            const member = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                address: document.getElementById('memberAddress').value.trim(),
+                birthday: document.getElementById('memberBirthday').value,
+                yangsenTeam: document.getElementById('memberYangsenTeam').value.trim(),
+                yangsenLevel: document.getElementById('memberYangsenLevel').value,
+                teacher: document.getElementById('memberTeacher').value.trim(),
+                no: document.getElementById('memberNo').value.trim(),
+                yuelaiTeam: document.getElementById('memberYuelaiTeam').value.trim(),
+                yuelaiLevel: document.getElementById('memberYuelaiLevel').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            members.push(member);
+            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            
+            ['memberName', 'memberPhone', 'memberAddress', 'memberBirthday', 'memberYangsenTeam', 'memberYangsenLevel', 'memberTeacher', 'memberNo', 'memberYuelaiTeam', 'memberYuelaiLevel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            
+            closeModal('addMemberModal');
+            updateStats();
+            checkBirthday();
+            if (currentTab === 'members') renderMembers();
+            alert('会员添加成功！');
+        }
+        
+        // 添加会员（页面）
+        function addMemberFromPage() {
+            const name = document.getElementById('pageMemberName').value.trim();
+            const phone = document.getElementById('pageMemberPhone').value.trim();
+            
+            if (!name || !phone) {
+                alert('请输入姓名和手机号');
+                return;
+            }
+            
+            if (members.find(m => m.phone === phone)) {
+                alert('此手机号已存在！');
+                return;
+            }
+            
+            const member = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                address: document.getElementById('pageMemberAddress').value.trim(),
+                birthday: document.getElementById('pageMemberBirthday').value,
+                yangsenTeam: document.getElementById('pageMemberYangsenTeam').value.trim(),
+                yangsenLevel: document.getElementById('pageMemberYangsenLevel').value,
+                teacher: document.getElementById('pageMemberTeacher').value.trim(),
+                no: document.getElementById('pageMemberNo').value.trim(),
+                yuelaiTeam: document.getElementById('pageMemberYuelaiTeam').value.trim(),
+                yuelaiLevel: document.getElementById('pageMemberYuelaiLevel').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            members.push(member);
+            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            
+            ['pageMemberName', 'pageMemberPhone', 'pageMemberAddress', 'pageMemberBirthday', 'pageMemberYangsenTeam', 'pageMemberYangsenLevel', 'pageMemberTeacher', 'pageMemberNo', 'pageMemberYuelaiTeam', 'pageMemberYuelaiLevel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            
+            updateStats();
+            checkBirthday();
+            renderMembers();
+            alert('会员添加成功！');
+        }
+        
+        // 添加拿货记录（弹窗）
+        function addRecord() {
+            const memberId = document.getElementById('recordMember').value;
+            const yangsenAmt = parseFloat(document.getElementById('recordYangsenAmount').value) || 0;
+            const yuelaiAmt = parseFloat(document.getElementById('recordYuelaiAmount').value) || 0;
+            
+            if (!memberId || (yangsenAmt + yuelaiAmt) <= 0) {
+                alert('请选择会员并输入金额');
+                return;
+            }
+            
+            const record = {
+                id: Date.now(),
+                memberId: parseInt(memberId),
+                date: document.getElementById('recordDate').value,
+                product: document.getElementById('recordProduct').value.trim(),
+                price: parseFloat(document.getElementById('recordPrice').value) || 0,
+                yangsenQty: parseInt(document.getElementById('recordYangsenQty').value) || 0,
+                yuelaiQty: parseInt(document.getElementById('recordYuelaiQty').value) || 0,
+                yangsenAmount: yangsenAmt,
+                yuelaiAmount: yuelaiAmt,
+                ticket: document.getElementById('recordTicket').value.trim()
+            };
+            
+            records.push(record);
+            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            
+            closeModal('addRecordModal');
+            updateStats();
+            
+            if (currentTab === 'addRecord') renderAddRecord();
+            else if (currentTab === 'members') renderMembers();
+            alert('拿货记录添加成功！');
+        }
+        
+        // 删除会员
+        function deleteMember(index) {
+            if (!confirm('确定删除此会员吗？')) return;
+            
+            const member = members[index];
+            records = records.filter(r => r.memberId !== member.id);
+            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            
+            members.splice(index, 1);
+            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            
+            updateStats();
+            checkBirthday();
+            renderMembers();
+            alert('会员已删除');
+        }
+        
+        // 打开编辑弹窗
+        let editMemberIndex = null;
+        function openEditMember(index) {
+            editMemberIndex = index;
+            const m = members[index];
+            
+            document.getElementById('editMemberName').value = m.name || '';
+            document.getElementById('editMemberPhone').value = m.phone || '';
+            document.getElementById('editMemberAddress').value = m.address || '';
+            document.getElementById('editMemberBirthday').value = m.birthday || '';
+            document.getElementById('editMemberYangsenTeam').value = m.yangsenTeam || '';
+            document.getElementById('editMemberYangsenLevel').value = m.yangsenLevel || '';
+            document.getElementById('editMemberTeacher').value = m.teacher || '';
+            document.getElementById('editMemberNo').value = m.no || '';
+            document.getElementById('editMemberYuelaiTeam').value = m.yuelaiTeam || '';
+            document.getElementById('editMemberYuelaiLevel').value = m.yuelaiLevel || '';
+            
+            openModal('editMemberModal');
+        }
+        
+        // 保存编辑
+        function saveEditMember() {
+            const name = document.getElementById('editMemberName').value.trim();
+            const phone = document.getElementById('editMemberPhone').value.trim();
+            
+            if (!name || !phone) {
+                alert('请输入姓名和手机号');
+                return;
+            }
+            
+            // 检查手机号是否被其他会员使用
+            const existingMember = members.find(m => m.phone === phone && members.indexOf(m) !== editMemberIndex);
+            if (existingMember) {
+                alert('此手机号已被其他会员使用！');
+                return;
+            }
+            
+            const m = members[editMemberIndex];
+            m.name = name;
+            m.phone = phone;
+            m.address = document.getElementById('editMemberAddress').value.trim();
+            m.birthday = document.getElementById('editMemberBirthday').value;
+            m.yangsenTeam = document.getElementById('editMemberYangsenTeam').value.trim();
+            m.yangsenLevel = document.getElementById('editMemberYangsenLevel').value;
+            m.teacher = document.getElementById('editMemberTeacher').value.trim();
+            m.no = document.getElementById('editMemberNo').value.trim();
+            m.yuelaiTeam = document.getElementById('editMemberYuelaiTeam').value.trim();
+            m.yuelaiLevel = document.getElementById('editMemberYuelaiLevel').value;
+            
+            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            
+            closeModal('editMemberModal');
+            updateStats();
+            checkBirthday();
+            viewMember(editMemberIndex);
+            alert('✅ 会员信息已更新！');
+        }
+        
+        // 打开弹窗
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('show');
+            
+            if (modalId === 'addRecordModal') {
+                const select = document.getElementById('recordMember');
+                select.innerHTML = '<option value="">请选择会员</option>' + members.map(m => `<option value="${m.id}">${m.name} (${m.phone || '无电话'})</option>`).join('');
+                document.getElementById('recordDate').value = new Date().toISOString().split('T')[0];
+            }
+        }
+        
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        // 导出数据备份
+        function exportData() {
+            const data = {
+                version: '1.0',
+                exportTime: new Date().toISOString(),
+                members: members,
+                records: records
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0,10);
+            a.href = url;
+            a.download = `倩倩会员数据备份_${dateStr}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert(`✅ 导出成功！\n文件名：倩倩会员数据备份_${dateStr}.json\n请妥善保存此文件，换手机时导入即可恢复数据。`);
+        }
+        
+        // 导入数据恢复
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.members || !data.records) {
+                        alert('❌ 文件格式不对，请选择正确的备份文件！');
+                        return;
+                    }
+                    
+                    const memberCount = data.members.length;
+                    const recordCount = data.records.length;
+                    
+                    if (!confirm(`📦 即将导入数据：\n• 会员：${memberCount} 人\n• 拿货记录：${recordCount} 条\n\n⚠️ 导入后会覆盖现有数据，确定吗？`)) {
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    members = data.members;
+                    records = data.records;
+                    localStorage.setItem('fuguan_members', JSON.stringify(members));
+                    localStorage.setItem('fuguan_records', JSON.stringify(records));
+                    
+                    updateStats();
+                    checkBirthday();
+                    switchTab('members');
+                    
+                    alert(`🎉 导入成功！\n已恢复 ${memberCount} 位会员、${recordCount} 条拿货记录！`);
+                } catch(err) {
+                    alert('❌ 导入失败，文件可能已损坏，请重新导出备份！');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+        
+        // 点击背景关闭弹窗
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+        
+        // 回车登录
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('adminPassword').addEventListener('keypress', e => { if (e.key === 'Enter') adminLogin(); });
+            document.getElementById('customerPhone').addEventListener('keypress', e => { if (e.key === 'Enter') customerLogin(); });
+            
+            // 检查登录状态
+            if (sessionStorage.getItem('fuguan_admin') === 'true') {
+                showAdminPage();
+            } else if (sessionStorage.getItem('fuguan_customer')) {
+                const member = members.find(m => m.id === parseInt(sessionStorage.getItem('fuguan_customer')));
+                if (member) {
+                    currentCustomerId = member.id;
+                    showCustomerPage(member);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
