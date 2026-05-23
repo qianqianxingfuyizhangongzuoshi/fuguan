@@ -141,6 +141,19 @@
         .btn-backup:hover { transform: scale(1.03); }
         .btn-export { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
         .btn-import { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-sync { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        
+        /* 同步状态 */
+        .sync-status { font-size: 10px; color: #999; text-align: center; margin-top: 4px; }
+        .sync-status.synced { color: #38ef7d; }
+        .sync-status.syncing { color: #f5af19; }
+        .sync-status.error { color: #e74c3c; }
+        .sync-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+        .sync-indicator.synced { background: #38ef7d; }
+        .sync-indicator.syncing { background: #f5af19; animation: pulse 1s infinite; }
+        .sync-indicator.error { background: #e74c3c; }
+        .sync-indicator.offline { background: #ccc; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
         
         /* 统计图表 */
         .mini-chart { display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 8px; }
@@ -218,6 +231,17 @@
                 <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importData(event)">
             </div>
             
+            <!-- 云同步栏 -->
+            <div class="backup-bar" style="flex-wrap:wrap;">
+                <span class="backup-label">☁️ 云同步</span>
+                <button class="btn-backup btn-sync" id="syncBtn" onclick="manualSync()">🔄 同步数据</button>
+                <button class="btn-backup" style="background:#f0f0f0;color:#666;flex:0;padding:8px 12px;" onclick="openSyncSettings()">⚙️</button>
+                <div class="sync-status" id="syncStatus" style="width:100%;">
+                    <span class="sync-indicator offline" id="syncIndicator"></span>
+                    <span id="syncText">未配置云同步</span>
+                </div>
+            </div>
+            
             <!-- 生日提醒 -->
             <div class="birthday-alert" id="birthdayAlert" style="display:none;">
                 <div class="title">🎂 今日生日提醒</div>
@@ -271,6 +295,41 @@
             </div>
             <button class="btn" onclick="addMember()">添加会员</button>
             <button class="btn btn-secondary" onclick="closeModal('addMemberModal')">取消</button>
+        </div>
+    </div>
+    
+    <!-- 云同步设置弹窗 -->
+    <div class="modal" id="syncSettingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>☁️ 云同步设置</h3>
+                <button class="modal-close" onclick="closeModal('syncSettingsModal')">&times;</button>
+            </div>
+            <div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.6;">
+                配置后，数据会自动同步到GitHub云端，手机电脑数据实时一致，再也不怕丢会员！
+            </div>
+            <div class="form-group">
+                <label>GitHub Token *</label>
+                <input type="password" id="syncTokenInput" placeholder="ghp_xxxxxxxxxxxx">
+                <div style="font-size:10px;color:#999;margin-top:4px;">在GitHub → Settings → Developer settings → Personal access tokens 生成，勾选 repo 权限</div>
+            </div>
+            <div class="form-group">
+                <label>GitHub 用户名</label>
+                <input type="text" id="syncOwnerInput" placeholder="你的GitHub用户名" value="qianqianxingfuyizhangongzuoshi">
+            </div>
+            <div class="form-group">
+                <label>仓库名</label>
+                <input type="text" id="syncRepoInput" placeholder="fuguan" value="fuguan">
+            </div>
+            <div class="form-group">
+                <label>数据文件名</label>
+                <input type="text" id="syncFileInput" placeholder="cloud-data.json" value="cloud-data.json">
+            </div>
+            <button class="btn" onclick="saveSyncSettings()">💾 保存设置</button>
+            <button class="btn btn-secondary" onclick="closeModal('syncSettingsModal')">取消</button>
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid #eee;">
+                <button class="btn btn-danger" style="font-size:12px;padding:8px;" onclick="clearSyncSettings()">🗑️ 清除云同步配置</button>
+            </div>
         </div>
     </div>
     
@@ -369,7 +428,7 @@
                 "金净原粉": 146, "酸枣核桃饮": 210, "鸸鹋油": 174, "姜根油": 100,
                 "舒痛贴布": 144, "氨糖软骨素钙": 280, "胶原蛋白钙肽粉": 256,
                 "清霏茶萃": 188, "角鲨烯": 396, "三清茶萃": 188, "辅酶Q10": 170,
-                "南极磷虾油": 255, "航帆胶囊": 255, "葛玉肽饮": 170,
+                "南极磷虾油": 255, "航枫胶囊": 255, "葛玉肽饮": 170,
                 "复合益生菌粉": 260, "排毒贴": 196, "抗衰老123号": 1275,
                 "七白水光饮": 188, "减止餐": 640, "减止饮": 188,
                 "芦荟凝胶40g": 30, "芦荟凝胶100g": 85
@@ -381,7 +440,7 @@
                 "金净原粉": 165, "酸枣核桃饮": 248, "鸸鹋油": 198, "姜根油": 120,
                 "舒痛贴布": 170, "氨糖软骨素钙": 330, "胶原蛋白钙肽粉": 298,
                 "清霏茶萃": 220, "角鲨烯": 460, "三清茶萃": 220, "辅酶Q10": 200,
-                "南极磷虾油": 288, "航帆胶囊": 300, "葛玉肽饮": 200,
+                "南极磷虾油": 288, "航枫胶囊": 300, "葛玉肽饮": 200,
                 "复合益生菌粉": 300, "排毒贴": 225, "抗衰老123号": 1500,
                 "七白水光饮": 220, "减止餐": 750, "减止饮": 220,
                 "芦荟凝胶40g": 35, "芦荟凝胶100g": 100
@@ -441,7 +500,7 @@
             "三清": "三清茶萃",
             "辅酶": "辅酶Q10", "Q10": "辅酶Q10",
             "磷虾油": "南极磷虾油",
-            "航帆": "航帆胶囊", "胶囊": "航帆胶囊",
+            "航帆": "航枫胶囊", "胶囊": "航枫胶囊",
             "葛玉": "葛玉肽饮", "肽饮": "葛玉肽饮",
             "跃莱益生菌": "复合益生菌粉",
             "跃莱排毒贴": "排毒贴",
@@ -452,6 +511,13 @@
         };
         let members = JSON.parse(localStorage.getItem('fuguan_members')) || [];
         let records = JSON.parse(localStorage.getItem('fuguan_records')) || [];
+        
+        // 统一数据持久化函数：保存到localStorage并触发云同步
+        function persistData(skipSync) {
+            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            if (!skipSync) autoSyncPush();
+        }
         
         // 旧数据兼容：把旧的 level 字段迁移到 yangsenLevel
         members.forEach(m => {
@@ -466,15 +532,257 @@
         let currentCustomerId = null;
         let newOrderImages = []; // 录入时暂存的图片
         
+        // ===== 云同步相关 =====
+        let syncConfig = JSON.parse(localStorage.getItem('fuguan_sync_config')) || {};
+        let syncSha = localStorage.getItem('fuguan_sync_sha') || ''; // GitHub文件的SHA，用于更新
+        let syncBusy = false; // 防止并发同步
+        let lastSyncTime = localStorage.getItem('fuguan_sync_time') || '';
+        
+        function isSyncConfigured() {
+            return !!(syncConfig.token && syncConfig.owner && syncConfig.repo);
+        }
+        
+        function getSyncApiUrl() {
+            if (!isSyncConfigured()) return '';
+            var base = syncConfig.apiBase || 'https://api.github.com';
+            return base + '/repos/' + syncConfig.owner + '/' + syncConfig.repo + '/contents/' + (syncConfig.file || 'cloud-data.json') + '?ref=main';
+        }
+        
+        // 更新同步状态显示
+        function updateSyncStatus(status, text) {
+            var indicator = document.getElementById('syncIndicator');
+            var textEl = document.getElementById('syncText');
+            var statusDiv = document.getElementById('syncStatus');
+            if (!indicator || !textEl || !statusDiv) return;
+            
+            indicator.className = 'sync-indicator ' + status;
+            statusDiv.className = 'sync-status ' + status;
+            textEl.textContent = text;
+        }
+        
+        // 打开同步设置
+        function openSyncSettings() {
+            document.getElementById('syncTokenInput').value = syncConfig.token || '';
+            document.getElementById('syncOwnerInput').value = syncConfig.owner || 'qianqianxingfuyizhangongzuoshi';
+            document.getElementById('syncRepoInput').value = syncConfig.repo || 'fuguan';
+            document.getElementById('syncFileInput').value = syncConfig.file || 'cloud-data.json';
+            openModal('syncSettingsModal');
+        }
+        
+        // 保存同步设置
+        function saveSyncSettings() {
+            var token = document.getElementById('syncTokenInput').value.trim();
+            var owner = document.getElementById('syncOwnerInput').value.trim();
+            var repo = document.getElementById('syncRepoInput').value.trim() || 'fuguan';
+            var file = document.getElementById('syncFileInput').value.trim() || 'cloud-data.json';
+            
+            if (!token || !owner) {
+                alert('❌ Token和用户名不能为空！');
+                return;
+            }
+            
+            syncConfig = { token: token, owner: owner, repo: repo, file: file };
+            localStorage.setItem('fuguan_sync_config', JSON.stringify(syncConfig));
+            
+            closeModal('syncSettingsModal');
+            updateSyncStatus('synced', '✅ 云同步已配置，点击同步按钮拉取数据');
+            
+            // 配置后自动拉取一次
+            pullFromCloud();
+        }
+        
+        // 清除同步设置
+        function clearSyncSettings() {
+            if (!confirm('⚠️ 确定要清除云同步配置吗？\n清除后不会删除云端数据，但本系统将不再自动同步。')) return;
+            syncConfig = {};
+            syncSha = '';
+            localStorage.removeItem('fuguan_sync_config');
+            localStorage.removeItem('fuguan_sync_sha');
+            localStorage.removeItem('fuguan_sync_time');
+            updateSyncStatus('offline', '未配置云同步');
+            closeModal('syncSettingsModal');
+        }
+        
+        // 从云端拉取数据
+        async function pullFromCloud() {
+            if (!isSyncConfigured()) {
+                updateSyncStatus('offline', '未配置云同步');
+                return false;
+            }
+            if (syncBusy) return false;
+            syncBusy = true;
+            updateSyncStatus('syncing', '🔄 正在从云端拉取数据...');
+            
+            try {
+                var resp = await fetch(getSyncApiUrl(), {
+                    headers: {
+                        'Authorization': 'token ' + syncConfig.token,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (resp.status === 404) {
+                    // 云端还没数据，需要首次推送
+                    syncBusy = false;
+                    updateSyncStatus('synced', '☁️ 云端暂无数据，将自动上传当前数据');
+                    pushToCloud();
+                    return true;
+                }
+                
+                if (!resp.ok) {
+                    throw new Error('HTTP ' + resp.status);
+                }
+                
+                var data = await resp.json();
+                syncSha = data.sha;
+                localStorage.setItem('fuguan_sync_sha', syncSha);
+                
+                // 解码base64内容
+                var content = atob(data.content.replace(/\n/g, ''));
+                var cloudData = JSON.parse(content);
+                
+                if (cloudData.members && cloudData.records) {
+                    // 比较时间戳：如果云端更新就覆盖本地
+                    var cloudTime = cloudData.lastModified || '';
+                    var localTime = lastSyncTime || '';
+                    
+                    members = cloudData.members;
+                    records = cloudData.records;
+                    persistData(true); // 从云端拉取，不需要再推送
+                    
+                    lastSyncTime = new Date().toISOString();
+                    localStorage.setItem('fuguan_sync_time', lastSyncTime);
+                    
+                    // 刷新界面
+                    updateStats();
+                    checkBirthday();
+                    if (currentTab === 'members') switchTab('members');
+                    if (currentTab === 'addRecord') switchTab('addRecord');
+                    
+                    updateSyncStatus('synced', '✅ 已同步 ' + members.length + ' 位会员 · ' + new Date().toLocaleTimeString());
+                }
+                
+                syncBusy = false;
+                return true;
+            } catch(e) {
+                console.error('拉取失败:', e);
+                updateSyncStatus('error', '❌ 同步失败: ' + e.message);
+                syncBusy = false;
+                return false;
+            }
+        }
+        
+        // 推送数据到云端
+        async function pushToCloud() {
+            if (!isSyncConfigured()) return false;
+            if (syncBusy) return false;
+            syncBusy = true;
+            updateSyncStatus('syncing', '🔄 正在上传数据到云端...');
+            
+            try {
+                var payload = {
+                    members: members,
+                    records: records,
+                    lastModified: new Date().toISOString()
+                };
+                var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+                
+                var body = {
+                    message: '数据同步 ' + new Date().toLocaleString('zh-CN'),
+                    content: content
+                };
+                
+                // 如果有SHA说明是更新，没有说明是新建
+                if (syncSha) {
+                    body.sha = syncSha;
+                }
+                
+                var resp = await fetch(getSyncApiUrl(), {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + syncConfig.token,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!resp.ok) {
+                    var errData = await resp.json().catch(function(){ return {}; });
+                    // 如果是SHA冲突，重新拉取再推送
+                    if (resp.status === 409 || (errData.message && errData.message.includes('SHA'))) {
+                        syncSha = '';
+                        localStorage.removeItem('fuguan_sync_sha');
+                        syncBusy = false;
+                        pullFromCloud();
+                        return false;
+                    }
+                    throw new Error('HTTP ' + resp.status + ' ' + (errData.message || ''));
+                }
+                
+                var result = await resp.json();
+                syncSha = result.content.sha;
+                localStorage.setItem('fuguan_sync_sha', syncSha);
+                
+                lastSyncTime = new Date().toISOString();
+                localStorage.setItem('fuguan_sync_time', lastSyncTime);
+                
+                updateSyncStatus('synced', '✅ 已同步 ' + members.length + ' 位会员 · ' + new Date().toLocaleTimeString());
+                syncBusy = false;
+                return true;
+            } catch(e) {
+                console.error('推送失败:', e);
+                updateSyncStatus('error', '❌ 上传失败: ' + e.message);
+                syncBusy = false;
+                return false;
+            }
+        }
+        
+        // 手动同步按钮
+        async function manualSync() {
+            if (!isSyncConfigured()) {
+                openSyncSettings();
+                return;
+            }
+            await pullFromCloud();
+        }
+        
+        // 数据变更后自动推送（带防抖3秒）
+        var syncDebounceTimer = null;
+        function autoSyncPush() {
+            if (!isSyncConfigured()) return;
+            if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+            syncDebounceTimer = setTimeout(function() {
+                pushToCloud();
+            }, 3000); // 数据变更3秒后自动上传，避免频繁操作时反复推送
+        }
+        
+        // 初始化同步状态
+        function initSyncStatus() {
+            if (isSyncConfigured()) {
+                if (lastSyncTime) {
+                    updateSyncStatus('synced', '✅ 上次同步: ' + new Date(lastSyncTime).toLocaleString('zh-CN'));
+                } else {
+                    updateSyncStatus('synced', '☁️ 已配置，点击同步按钮拉取数据');
+                }
+            } else {
+                updateSyncStatus('offline', '未配置云同步');
+            }
+        }
+        
         // 切换登录方式
         function switchLoginTab(type) {
             loginType = type;
-            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
+            // 根据 type 直接高亮对应的 tab，不依赖 event
+            document.querySelectorAll('.login-tab').forEach(t => {
+                const isActive = (type === 'admin' && t.textContent.includes('店主')) ||
+                                 (type === 'customer' && t.textContent.includes('会员'));
+                t.classList.toggle('active', isActive);
+            });
+
             document.getElementById('adminLoginBox').style.display = type === 'admin' ? 'block' : 'none';
             document.getElementById('customerLoginBox').style.display = type === 'customer' ? 'block' : 'none';
-            
+
             document.getElementById('adminError').style.display = 'none';
             document.getElementById('customerError').style.display = 'none';
         }
@@ -500,7 +808,7 @@
             
             const member = members.find(m => {
                 if (!m.phone) return false;
-                let storedPhone = m.phone.replace(/[\s\-]/g, '');
+                let storedPhone = (m.phone || '').replace(/[\s\-]/g, '');
                 if (storedPhone.startsWith('+86')) storedPhone = storedPhone.substring(3);
                 if (storedPhone.startsWith('86') && storedPhone.length === 13) storedPhone = storedPhone.substring(2);
                 return storedPhone === phone;
@@ -535,6 +843,12 @@
             updateStats();
             checkBirthday();
             switchTab('members');
+            
+            // 初始化同步状态，登录后自动拉取云端数据
+            initSyncStatus();
+            if (isSyncConfigured()) {
+                pullFromCloud();
+            }
         }
         
         // 显示顾客页面
@@ -580,6 +894,10 @@
         
         // 切换标签
         function switchTab(tab) {
+            // 如果正在录入拿货页面且有未保存数据，先保存草稿
+            if (currentTab === 'addRecord' && hasUnsavedRecordData()) {
+                saveRecordDraft();
+            }
             currentTab = tab;
             document.querySelectorAll('#adminPage .nav-tab').forEach(t => t.classList.remove('active'));
             const navTabs = document.querySelectorAll('#adminPage .nav-tab');
@@ -595,6 +913,76 @@
                 case 'addRecord': renderAddRecord(); break;
                 case 'analysis': renderAnalysis(); break;
             }
+        }
+        
+        // 检查录入拿货页面是否有未保存的数据
+        function hasUnsavedRecordData() {
+            if (productRows.length === 0) return false;
+            // 有任何产品名或金额就算有数据
+            return productRows.some(r => (r.product && r.product.trim()) || r.yangsenAmount > 0 || r.yuelaiAmount > 0);
+        }
+        
+        // 保存录入拿货草稿到 sessionStorage
+        function saveRecordDraft() {
+            const memberId = document.getElementById('pageRecordMember');
+            const dateEl = document.getElementById('pageRecordDate');
+            const ticketEl = document.getElementById('pageRecordTicket');
+            const draft = {
+                memberId: memberId ? memberId.value : '',
+                date: dateEl ? dateEl.value : '',
+                ticket: ticketEl ? ticketEl.value : '',
+                productRows: productRows,
+                images: newOrderImages || []
+            };
+            sessionStorage.setItem('fuguan_record_draft', JSON.stringify(draft));
+        }
+        
+        // 恢复录入拿货草稿
+        function restoreRecordDraft() {
+            const saved = sessionStorage.getItem('fuguan_record_draft');
+            if (!saved) return false;
+            try {
+                const draft = JSON.parse(saved);
+                // 恢复会员选择
+                if (draft.memberId) {
+                    const select = document.getElementById('pageRecordMember');
+                    if (select) {
+                        select.value = draft.memberId;
+                        onRecordMemberChange();
+                    }
+                }
+                // 恢复日期
+                if (draft.date) {
+                    const dateEl = document.getElementById('pageRecordDate');
+                    if (dateEl) dateEl.value = draft.date;
+                }
+                // 恢复票据
+                if (draft.ticket) {
+                    const ticketEl = document.getElementById('pageRecordTicket');
+                    if (ticketEl) ticketEl.value = draft.ticket;
+                }
+                // 恢复产品行
+                if (draft.productRows && draft.productRows.length > 0) {
+                    productRows = draft.productRows;
+                    renderProductRows();
+                }
+                // 恢复图片
+                if (draft.images && draft.images.length > 0) {
+                    newOrderImages = draft.images;
+                    renderNewOrderImages();
+                }
+                // 清除草稿
+                sessionStorage.removeItem('fuguan_record_draft');
+                return true;
+            } catch(e) {
+                sessionStorage.removeItem('fuguan_record_draft');
+                return false;
+            }
+        }
+        
+        // 清除草稿
+        function clearRecordDraft() {
+            sessionStorage.removeItem('fuguan_record_draft');
         }
         
         // 计算活跃度（流失：70天没拿货）
@@ -636,6 +1024,9 @@
             const content = document.getElementById('contentArea');
             let html = `
                 <div class="section-title">👥 会员列表（共${members.length}人）</div>
+                <div style="margin-bottom:10px;">
+                    <input type="text" id="memberListSearch" placeholder="🔍 搜索会员名字..." oninput="filterMemberList()" style="width:100%;padding:8px 10px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;">
+                </div>
                 <button class="btn" onclick="openModal('addMemberModal')" style="margin-bottom: 12px;">+ 添加新会员</button>
             `;
             
@@ -649,7 +1040,7 @@
                     const birthdayBadge = m.birthday ? `<span class="birthday-badge">🎂 ${m.birthday.slice(5)}</span>` : '';
                     
                     html += `
-                        <div class="member-card" onclick="viewMember(${index})">
+                        <div class="member-card" data-name="${m.name}" onclick="viewMember(${index})">
                             <div class="name-row">
                                 <span class="name">${m.name} ${getActivityLabel(activity)}</span>
                                 <span class="level">${m.level || '会员'}</span>
@@ -809,29 +1200,44 @@
             // 重置产品行，初始一行
             productRows = [{product: '', yangsenPrice: 0, yangsenQty: 0, yangsenAmount: 0, yuelaiPrice: 0, yuelaiQty: 0, yuelaiAmount: 0}];
             newOrderImages = []; // 重置图片
-            
+
+            // 检查是否有草稿可以恢复
+            const hasDraft = sessionStorage.getItem('fuguan_record_draft');
+
             html += `
-                <div class="form-group"><label>选择会员 *</label><select id="pageRecordMember" onchange="onRecordMemberChange()"><option value="">请选择会员</option>${members.map(m => `<option value="${m.id}">${m.name} (${m.phone || '无电话'})</option>`).join('')}</select></div>
+                <div class="form-group"><label>选择会员 *</label></div>
+                <div style="margin-bottom:10px;">
+                    <input type="text" id="memberSearchInput" placeholder="🔍 输入会员名字搜索..." oninput="filterMemberList()" style="width:100%;padding:8px 10px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;margin-bottom:6px;">
+                    <select id="pageRecordMember" onchange="onRecordMemberChange()" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;">
+                        <option value="">请选择会员</option>
+                        ${members.map(m => `<option value="${m.id}" data-name="${m.name}">${m.name}（${m.phone || '无电话'}）</option>`).join('')}
+                    </select>
+                </div>
                 <div class="form-group"><label>时间</label><input type="date" id="pageRecordDate" value="${new Date().toISOString().split('T')[0]}"></div>
-                
+
                 <div class="section-title" style="font-size:13px;">🛍️ 产品明细</div>
                 <div id="productRowsContainer"></div>
                 <button class="btn btn-secondary" onclick="addProductRow()" style="margin-top:6px;margin-bottom:8px;">+ 再加一个产品</button>
-                
+
                 <div class="form-group"><label>票码</label><input type="text" id="pageRecordTicket" placeholder="票据编码"></div>
-                
+
                 <div style="margin-bottom:10px;">
                     <div style="font-size:12px;color:#666;margin-bottom:6px;">📸 拿货单图片（最多5张）</div>
                     <div class="image-gallery" id="newOrderImages"></div>
                     <button type="button" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="addNewOrderImage()">＋ 添加图片</button>
                 </div>
-                
+
                 <div id="totalPreview" style="background:#fff9e6;border-radius:8px;padding:10px;text-align:center;font-size:16px;font-weight:bold;color:#e74c3c;margin-bottom:10px;display:none;">💰 本次合计：¥<span id="totalPreviewNum">0</span></div>
                 <button class="btn" onclick="addRecordFromPage()">✅ 确认录入（可一次性录多个产品）</button>
             `;
-            
+
             content.innerHTML = html;
             renderProductRows();
+
+            // 如果有草稿，恢复之
+            if (hasDraft) {
+                restoreRecordDraft();
+            }
         }
         
         // 渲染产品行
@@ -868,6 +1274,53 @@
         function onRecordMemberChange() {
             const memberId = parseInt(document.getElementById('pageRecordMember').value);
             currentRecordMember = members.find(m => m.id === memberId) || null;
+        }
+        
+        // 会员名字搜索功能（同时支持录入页和会员列表页）
+        function filterMemberList() {
+            // 判断当前在哪个页面
+            const inputRecord = document.getElementById('memberSearchInput');
+            const inputList = document.getElementById('memberListSearch');
+            const keyword = (inputRecord ? inputRecord.value : (inputList ? inputList.value : '')).trim().toLowerCase();
+            
+            if (!keyword) {
+                // 清空搜索，恢复显示所有
+                if (inputRecord) {
+                    const sel = document.getElementById('pageRecordMember');
+                    if (sel) { Array.from(sel.querySelectorAll('option')).forEach(o => o.style.display = ''); }
+                }
+                if (inputList) {
+                    document.querySelectorAll('.member-card').forEach(c => c.style.display = '');
+                }
+                return;
+            }
+
+            // 录入页：过滤 select 选项
+            const sel = document.getElementById('pageRecordMember');
+            if (sel) {
+                const options = sel.querySelectorAll('option');
+                let visibleCount = 0;
+                options.forEach(opt => {
+                    if (!opt.value) { opt.style.display = ''; return; }
+                    const name = (opt.getAttribute('data-name') || '').toLowerCase();
+                    if (name.includes(keyword)) {
+                        opt.style.display = '';
+                        visibleCount++;
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                });
+                if (visibleCount === 1) {
+                    const visible = Array.from(options).find(o => o.value && o.style.display !== 'none');
+                    if (visible) { sel.value = visible.value; onRecordMemberChange(); }
+                }
+            }
+
+            // 会员列表页：过滤会员卡片
+            document.querySelectorAll('.member-card').forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                card.style.display = name.includes(keyword) ? '' : 'none';
+            });
         }
         
         // 添加产品行
@@ -1075,7 +1528,8 @@
             
             records.push(order);
             newOrderImages = []; // 清空暂存
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            clearRecordDraft(); // 清除草稿
+            persistData();
             updateStats();
             switchTab('members');
             alert('✅ 录入成功！共 ' + products.length + ' 个产品，已保存为1个拿货单！');
@@ -1358,9 +1812,7 @@
             };
             
             members.push(member);
-            localStorage.setItem('fuguan_members', JSON.stringify(members));
-            
-            ['memberName', 'memberPhone', 'memberAddress', 'memberBirthday', 'memberYangsenTeam', 'memberYangsenLevel', 'memberTeacher', 'memberNo', 'memberYuelaiTeam', 'memberYuelaiLevel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            persistData();
             
             closeModal('addMemberModal');
             updateStats();
@@ -1400,9 +1852,7 @@
             };
             
             members.push(member);
-            localStorage.setItem('fuguan_members', JSON.stringify(members));
-            
-            ['pageMemberName', 'pageMemberPhone', 'pageMemberAddress', 'pageMemberBirthday', 'pageMemberYangsenTeam', 'pageMemberYangsenLevel', 'pageMemberTeacher', 'pageMemberNo', 'pageMemberYuelaiTeam', 'pageMemberYuelaiLevel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            persistData();
             
             updateStats();
             checkBirthday();
@@ -1435,9 +1885,7 @@
             };
             
             records.push(record);
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
-            
-            closeModal('addRecordModal');
+            persistData();
             updateStats();
             
             if (currentTab === 'addRecord') renderAddRecord();
@@ -1451,10 +1899,8 @@
             
             const member = members[index];
             records = records.filter(r => r.memberId !== member.id);
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
-            
             members.splice(index, 1);
-            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            persistData();
             
             updateStats();
             checkBirthday();
@@ -1511,7 +1957,7 @@
             m.yuelaiTeam = document.getElementById('editMemberYuelaiTeam').value.trim();
             m.yuelaiLevel = document.getElementById('editMemberYuelaiLevel').value;
             
-            localStorage.setItem('fuguan_members', JSON.stringify(members));
+            persistData();
             
             closeModal('editMemberModal');
             updateStats();
@@ -1581,8 +2027,7 @@
                     
                     members = data.members;
                     records = data.records;
-                    localStorage.setItem('fuguan_members', JSON.stringify(members));
-                    localStorage.setItem('fuguan_records', JSON.stringify(records));
+                    persistData();
                     
                     updateStats();
                     checkBirthday();
@@ -1641,7 +2086,7 @@
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         const compressed = canvas.toDataURL('image/jpeg', 0.6);
                         order.images.push(compressed);
-                        localStorage.setItem('fuguan_records', JSON.stringify(records));
+                        persistData();
                         // 刷新当前会员详情
                         const memberIndex = members.findIndex(m => m.id === order.memberId);
                         if (memberIndex >= 0) viewMember(memberIndex);
@@ -1657,7 +2102,7 @@
             if (!confirm('确定删除这张图片吗？')) return;
             const order = records[recordIndex];
             order.images.splice(imgIndex, 1);
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            persistData();
             const memberIndex = members.findIndex(m => m.id === order.memberId);
             if (memberIndex >= 0) viewMember(memberIndex);
         }
@@ -1674,13 +2119,35 @@
         }
         
         // ===== 拿货单编辑功能 =====
+        // 编辑拿货单时的临时产品行
+        let editProductRows = [];
+        let editRecordIndex = -1;
+        let editOrderMemberIndex = -1;
+
         function editOrder(recordIndex, memberIndex) {
             const order = records[recordIndex];
             if (!order.products || order.products.length === 0) {
                 alert('旧格式记录暂不支持编辑');
                 return;
             }
+            editRecordIndex = recordIndex;
+            editOrderMemberIndex = memberIndex;
+            // 深拷贝产品行用于编辑
+            editProductRows = order.products.map(p => ({
+                name: p.name || '',
+                yangsenPrice: p.yangsenPrice || 0,
+                yangsenQty: p.yangsenQty || 0,
+                yangsenAmount: p.yangsenAmount || 0,
+                yuelaiPrice: p.yuelaiPrice || 0,
+                yuelaiQty: p.yuelaiQty || 0,
+                yuelaiAmount: p.yuelaiAmount || 0
+            }));
+            renderEditOrder(order, memberIndex);
+        }
+
+        function renderEditOrder(order, memberIndex) {
             const content = document.getElementById('contentArea');
+            const member = members[memberIndex];
             let html = `
                 <div class="section-title" style="cursor:pointer" onclick="viewMember(${memberIndex})">← 返回会员详情</div>
                 <div class="section-title">✏️ 编辑拿货单</div>
@@ -1694,54 +2161,165 @@
                         <input type="text" id="editOrderTicket" value="${order.ticket || ''}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" placeholder="可选">
                     </div>
             `;
-            order.products.forEach((p, pi) => {
+            // 渲染每个产品行
+            editProductRows.forEach((p, pi) => {
                 html += `
-                    <div style="background:#f9f9f9;border-radius:8px;padding:10px;margin-bottom:8px;">
-                        <div style="font-size:12px;color:#11998e;font-weight:bold;margin-bottom:6px;">产品${pi+1}</div>
-                        <input type="text" id="editProd${pi}Name" value="${p.name || ''}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;margin-bottom:4px;" placeholder="产品名称">
+                    <div style="background:#f9f9f9;border-radius:8px;padding:10px;margin-bottom:8px;position:relative;">
+                        <div style="font-size:12px;color:#11998e;font-weight:bold;margin-bottom:6px;">产品${pi+1} ${editProductRows.length > 1 ? `<span onclick="removeEditProductRow(${pi})" style="color:#e74c3c;cursor:pointer;float:right;">🗑️ 删除</span>` : ''}</div>
+                        <input type="text" id="editProd${pi}Name" value="${p.name || ''}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;margin-bottom:4px;" placeholder="产品名称" oninput="onEditProductName(${pi})">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-                            <div><small style="color:#888;">🌿养森 数量</small><input type="number" id="editProd${pi}YsQty" value="${p.yangsenQty || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;"></div>
-                            <div><small style="color:#888;">🌿养森 金额</small><input type="number" id="editProd${pi}YsAmt" value="${p.yangsenAmount || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;"></div>
-                            <div><small style="color:#888;">🏅跃莱 数量</small><input type="number" id="editProd${pi}YlQty" value="${p.yuelaiQty || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;"></div>
-                            <div><small style="color:#888;">🏅跃莱 金额</small><input type="number" id="editProd${pi}YlAmt" value="${p.yuelaiAmount || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;"></div>
+                            <div><small style="color:#888;">🌿养森 单价</small><input type="number" id="editProd${pi}YsPrice" value="${p.yangsenPrice || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;" oninput="calcEditRow(${pi})"></div>
+                            <div><small style="color:#888;">🌿养森 数量</small><input type="number" id="editProd${pi}YsQty" value="${p.yangsenQty || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;" oninput="calcEditRow(${pi})"></div>
+                            <div><small style="color:#888;">🏅跃莱 单价</small><input type="number" id="editProd${pi}YlPrice" value="${p.yuelaiPrice || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;" oninput="calcEditRow(${pi})"></div>
+                            <div><small style="color:#888;">🏅跃莱 数量</small><input type="number" id="editProd${pi}YlQty" value="${p.yuelaiQty || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;" oninput="calcEditRow(${pi})"></div>
+                            <div><small style="color:#888;">🌿养森 金额</small><input type="number" id="editProd${pi}YsAmt" value="${p.yangsenAmount || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;background:#fafafa;" readonly></div>
+                            <div><small style="color:#888;">🏅跃莱 金额</small><input type="number" id="editProd${pi}YlAmt" value="${p.yuelaiAmount || 0}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:6px;background:#fafafa;" readonly></div>
                         </div>
                     </div>
                 `;
             });
+            // 添加产品按钮
+            html += `<button class="btn btn-secondary" onclick="addEditProductRow()" style="margin-top:2px;margin-bottom:10px;padding:8px;font-size:13px;">+ 再加一个产品</button>`;
+            // 编辑合计预览
+            html += `<div id="editTotalPreview" style="background:#fff9e6;border-radius:8px;padding:10px;text-align:center;font-size:16px;font-weight:bold;color:#e74c3c;margin-bottom:10px;">💰 合计：¥${calcEditTotal()}</div>`;
             // 图片区域
             html += `<div class="section-title" style="margin-top:10px;">📸 图片（${(order.images || []).length}/5）</div>
                 <div class="image-gallery">`;
             (order.images || []).forEach((img, imgIdx) => {
                 html += `<div class="image-item">
                     <img src="${img}" onclick="previewImage(this.src)">
-                    <button class="image-delete" onclick="event.stopPropagation();deleteOrderImage(${recordIndex},${imgIdx})">✕</button>
+                    <button class="image-delete" onclick="event.stopPropagation();deleteOrderImage(${editRecordIndex},${imgIdx})">✕</button>
                 </div>`;
             });
             if ((order.images || []).length < 5) {
-                html += `<div class="image-add" onclick="addOrderImage(${recordIndex})"><span>＋</span><small>添加图片</small></div>`;
+                html += `<div class="image-add" onclick="addOrderImage(${editRecordIndex})"><span>＋</span><small>添加图片</small></div>`;
             }
             html += `</div>`;
             html += `
                 </div>
-                <button class="btn" style="background:linear-gradient(135deg,#11998e,#38ef7d);color:white;" onclick="saveEditOrder(${recordIndex},${memberIndex})">💾 保存修改</button>
+                <button class="btn" style="background:linear-gradient(135deg,#11998e,#38ef7d);color:white;" onclick="saveEditOrder(${editRecordIndex},${editOrderMemberIndex})">💾 保存修改</button>
             `;
             content.innerHTML = html;
         }
-        
+
+        // 编辑时输入产品名称，自动匹配价格
+        function onEditProductName(pi) {
+            const input = (document.getElementById('editProd' + pi + 'Name') || {}).value || '';
+            editProductRows[pi].name = input;
+            const member = members[editOrderMemberIndex];
+            if (!member) return;
+            // 模糊匹配
+            let matchedName = null;
+            for (const [alias, name] of Object.entries(PRODUCT_ALIAS)) {
+                if (input.includes(alias) || alias.includes(input)) {
+                    matchedName = name;
+                    break;
+                }
+            }
+            if (!matchedName) return;
+            // 养森价格
+            const ysLevel = member.yangsenLevel;
+            if (ysLevel && YANGSEN_PRICE[ysLevel] && YANGSEN_PRICE[ysLevel][matchedName]) {
+                editProductRows[pi].yangsenPrice = YANGSEN_PRICE[ysLevel][matchedName];
+                editProductRows[pi].yuelaiPrice = 0;
+                editProductRows[pi].yuelaiQty = 0;
+                editProductRows[pi].yuelaiAmount = 0;
+                if (editProductRows[pi].yangsenQty === 0) editProductRows[pi].yangsenQty = 1;
+                editProductRows[pi].yangsenAmount = editProductRows[pi].yangsenQty * editProductRows[pi].yangsenPrice;
+                const priceEl = document.getElementById('editProd' + pi + 'YsPrice');
+                const ylPriceEl = document.getElementById('editProd' + pi + 'YlPrice');
+                const ylQtyEl = document.getElementById('editProd' + pi + 'YlQty');
+                const ylAmtEl = document.getElementById('editProd' + pi + 'YlAmt');
+                if (priceEl) priceEl.value = editProductRows[pi].yangsenPrice;
+                if (ylPriceEl) ylPriceEl.value = 0;
+                if (ylQtyEl) ylQtyEl.value = 0;
+                if (ylAmtEl) ylAmtEl.value = 0;
+                calcEditRow(pi);
+                return;
+            }
+            // 跃莱价格
+            const ylLevel = member.yuelaiLevel;
+            if (ylLevel && YUELAI_PRICE[ylLevel] && YUELAI_PRICE[ylLevel][matchedName]) {
+                editProductRows[pi].yuelaiPrice = YUELAI_PRICE[ylLevel][matchedName];
+                editProductRows[pi].yangsenPrice = 0;
+                editProductRows[pi].yangsenQty = 0;
+                editProductRows[pi].yangsenAmount = 0;
+                if (editProductRows[pi].yuelaiQty === 0) editProductRows[pi].yuelaiQty = 1;
+                editProductRows[pi].yuelaiAmount = editProductRows[pi].yuelaiQty * editProductRows[pi].yuelaiPrice;
+                const priceEl = document.getElementById('editProd' + pi + 'YlPrice');
+                const ysPriceEl = document.getElementById('editProd' + pi + 'YsPrice');
+                const ysQtyEl = document.getElementById('editProd' + pi + 'YsQty');
+                const ysAmtEl = document.getElementById('editProd' + pi + 'YsAmt');
+                if (priceEl) priceEl.value = editProductRows[pi].yuelaiPrice;
+                if (ysPriceEl) ysPriceEl.value = 0;
+                if (ysQtyEl) ysQtyEl.value = 0;
+                if (ysAmtEl) ysAmtEl.value = 0;
+                calcEditRow(pi);
+                return;
+            }
+        }
+
+        // 编辑时计算某行金额
+        function calcEditRow(pi) {
+            const ysPrice = parseFloat((document.getElementById('editProd' + pi + 'YsPrice') || {}).value) || 0;
+            const ysQty = parseInt((document.getElementById('editProd' + pi + 'YsQty') || {}).value) || 0;
+            const ylPrice = parseFloat((document.getElementById('editProd' + pi + 'YlPrice') || {}).value) || 0;
+            const ylQty = parseInt((document.getElementById('editProd' + pi + 'YlQty') || {}).value) || 0;
+            const ysAmt = ysPrice * ysQty;
+            const ylAmt = ylPrice * ylQty;
+            editProductRows[pi].yangsenPrice = ysPrice;
+            editProductRows[pi].yangsenQty = ysQty;
+            editProductRows[pi].yangsenAmount = ysAmt;
+            editProductRows[pi].yuelaiPrice = ylPrice;
+            editProductRows[pi].yuelaiQty = ylQty;
+            editProductRows[pi].yuelaiAmount = ylAmt;
+            const ysAmtEl = document.getElementById('editProd' + pi + 'YsAmt');
+            const ylAmtEl = document.getElementById('editProd' + pi + 'YlAmt');
+            if (ysAmtEl) ysAmtEl.value = ysAmt;
+            if (ylAmtEl) ylAmtEl.value = ylAmt;
+            // 更新合计
+            const totalEl = document.getElementById('editTotalPreview');
+            if (totalEl) totalEl.innerHTML = '💰 合计：¥' + calcEditTotal();
+        }
+
+        // 计算编辑时总金额
+        function calcEditTotal() {
+            return editProductRows.reduce((s, r) => s + (r.yangsenAmount || 0) + (r.yuelaiAmount || 0), 0);
+        }
+
+        // 编辑时添加产品行
+        function addEditProductRow() {
+            editProductRows.push({name: '', yangsenPrice: 0, yangsenQty: 0, yangsenAmount: 0, yuelaiPrice: 0, yuelaiQty: 0, yuelaiAmount: 0});
+            renderEditOrder(records[editRecordIndex], editOrderMemberIndex);
+        }
+
+        // 编辑时删除产品行
+        function removeEditProductRow(pi) {
+            if (editProductRows.length <= 1) {
+                alert('至少要保留一个产品！');
+                return;
+            }
+            editProductRows.splice(pi, 1);
+            renderEditOrder(records[editRecordIndex], editOrderMemberIndex);
+        }
+
         function saveEditOrder(recordIndex, memberIndex) {
             const order = records[recordIndex];
             order.date = document.getElementById('editOrderDate').value;
             order.ticket = document.getElementById('editOrderTicket').value.trim();
-            order.products.forEach((p, pi) => {
-                p.name = (document.getElementById('editProd' + pi + 'Name') || {}).value || p.name;
-                p.yangsenQty = parseInt((document.getElementById('editProd' + pi + 'YsQty') || {}).value) || 0;
-                p.yangsenAmount = parseFloat((document.getElementById('editProd' + pi + 'YsAmt') || {}).value) || 0;
-                p.yuelaiQty = parseInt((document.getElementById('editProd' + pi + 'YlQty') || {}).value) || 0;
-                p.yuelaiAmount = parseFloat((document.getElementById('editProd' + pi + 'YlAmt') || {}).value) || 0;
-            });
+            // 从 editProductRows 保存
+            order.products = editProductRows.map(p => ({
+                name: p.name || '产品',
+                yangsenPrice: p.yangsenPrice || 0,
+                yangsenQty: p.yangsenQty || 0,
+                yangsenAmount: p.yangsenAmount || 0,
+                yuelaiPrice: p.yuelaiPrice || 0,
+                yuelaiQty: p.yuelaiQty || 0,
+                yuelaiAmount: p.yuelaiAmount || 0
+            }));
             order.yangsenAmount = order.products.reduce((s, p) => s + (p.yangsenAmount || 0), 0);
             order.yuelaiAmount = order.products.reduce((s, p) => s + (p.yuelaiAmount || 0), 0);
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            persistData();
             updateStats();
             viewMember(memberIndex);
             alert('✅ 拿货单修改成功！');
@@ -1750,7 +2328,7 @@
         function deleteOrder(recordIndex, memberIndex) {
             if (!confirm('确定删除这个拿货单吗？删除后无法恢复！')) return;
             records.splice(recordIndex, 1);
-            localStorage.setItem('fuguan_records', JSON.stringify(records));
+            persistData();
             updateStats();
             viewMember(memberIndex);
             alert('✅ 拿货单已删除');
