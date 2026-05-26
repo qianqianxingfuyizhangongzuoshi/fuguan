@@ -1,9 +1,20 @@
 {
-    "records":  [
-
-                ],
-    "members":  [
-
-                ],
-    "lastModified":  "2026-05-23T22:33:16Z"
+  "members": [
+    {
+      "id": 1779803845581,
+      "name": "李倩",
+      "phone": "15690306690",
+      "address": "北齐同",
+      "birthday": "",
+      "yangsenTeam": "",
+      "yangsenLevel": "",
+      "teacher": "",
+      "no": "",
+      "yuelaiTeam": "",
+      "yuelaiLevel": "",
+      "createdAt": "2026-05-26T13:57:25.581Z"
+    }
+  ],
+  "records": [],
+  "lastModified": "2026-05-26T13:57:28.584Z"
 }
