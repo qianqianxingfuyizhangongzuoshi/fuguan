@@ -50,7 +50,28 @@
       "images": [],
       "yangsenAmount": 420,
       "yuelaiAmount": 0
+    },
+    {
+      "id": 1779878896786,
+      "type": "order",
+      "memberId": 1779878683312,
+      "date": "2026-03-31",
+      "ticket": "7057352",
+      "products": [
+        {
+          "name": "酵素液",
+          "yangsenPrice": 225,
+          "yangsenQty": 2,
+          "yangsenAmount": 450,
+          "yuelaiPrice": 0,
+          "yuelaiQty": 0,
+          "yuelaiAmount": 0
+        }
+      ],
+      "images": [],
+      "yangsenAmount": 450,
+      "yuelaiAmount": 0
     }
   ],
-  "lastModified": "2026-05-27T10:47:02.428Z"
+  "lastModified": "2026-05-27T10:48:19.789Z"
 }
