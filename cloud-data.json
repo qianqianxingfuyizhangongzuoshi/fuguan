@@ -2,17 +2,31 @@
   "members": [
     {
       "id": 1779878398016,
-      "name": "薛莎莎",
+      "name": "èèè",
       "phone": "15690306690",
-      "address": "芦园",
+      "address": "è¦å­",
       "birthday": "",
-      "yangsenTeam": "霞嫂子",
-      "yangsenLevel": "5盒",
-      "teacher": "李倩",
+      "yangsenTeam": "éå«å­",
+      "yangsenLevel": "5ç",
+      "teacher": "æå©",
       "no": "",
       "yuelaiTeam": "",
       "yuelaiLevel": "",
       "createdAt": "2026-05-27T10:39:58.016Z"
+    },
+    {
+      "id": 1779878683312,
+      "name": "张红",
+      "phone": "15128137662",
+      "address": "路江利农业技术服务站新乐市东环路与无繁公路交叉口正东方向211米左右",
+      "birthday": "",
+      "yangsenTeam": "霞嫂子",
+      "yangsenLevel": "2箱",
+      "teacher": "李倩",
+      "no": "",
+      "yuelaiTeam": "",
+      "yuelaiLevel": "",
+      "createdAt": "2026-05-27T10:44:43.312Z"
     }
   ],
   "records": [
@@ -24,7 +38,7 @@
       "ticket": "7057351",
       "products": [
         {
-          "name": "瘦瘦包",
+          "name": "ç¦ç¦å",
           "yangsenPrice": 420,
           "yangsenQty": 1,
           "yangsenAmount": 420,
@@ -38,5 +52,5 @@
       "yuelaiAmount": 0
     }
   ],
-  "lastModified": "2026-05-27T10:40:46.192Z"
+  "lastModified": "2026-05-27T10:44:46.317Z"
 }
