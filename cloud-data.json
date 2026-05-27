@@ -15,6 +15,28 @@
       "createdAt": "2026-05-27T10:39:58.016Z"
     }
   ],
-  "records": [],
-  "lastModified": "2026-05-27T10:40:01.019Z"
+  "records": [
+    {
+      "id": 1779878443192,
+      "type": "order",
+      "memberId": 1779878398016,
+      "date": "2026-03-06",
+      "ticket": "7057351",
+      "products": [
+        {
+          "name": "瘦瘦包",
+          "yangsenPrice": 420,
+          "yangsenQty": 1,
+          "yangsenAmount": 420,
+          "yuelaiPrice": 0,
+          "yuelaiQty": 0,
+          "yuelaiAmount": 0
+        }
+      ],
+      "images": [],
+      "yangsenAmount": 420,
+      "yuelaiAmount": 0
+    }
+  ],
+  "lastModified": "2026-05-27T10:40:46.192Z"
 }
