@@ -1,42 +1,5 @@
 {
-  "members": [
-    {
-      "id": 1779803845581,
-      "name": "李倩",
-      "phone": "15690306690",
-      "address": "北齐同",
-      "birthday": "",
-      "yangsenTeam": "",
-      "yangsenLevel": "5箱",
-      "teacher": "",
-      "no": "",
-      "yuelaiTeam": "",
-      "yuelaiLevel": "会员价",
-      "createdAt": "2026-05-26T13:57:25.581Z"
-    }
-  ],
-  "records": [
-    {
-      "id": 1779804749522,
-      "type": "order",
-      "memberId": 1779803845581,
-      "date": "2026-05-26",
-      "ticket": "",
-      "products": [
-        {
-          "name": "瘦瘦包",
-          "yangsenPrice": 260,
-          "yangsenQty": 1,
-          "yangsenAmount": 260,
-          "yuelaiPrice": 0,
-          "yuelaiQty": 0,
-          "yuelaiAmount": 0
-        }
-      ],
-      "images": [],
-      "yangsenAmount": 260,
-      "yuelaiAmount": 0
-    }
-  ],
-  "lastModified": "2026-05-26T14:12:32.524Z"
+  "members": [],
+  "records": [],
+  "lastModified": "2026-05-27T10:38:06.303Z"
 }
