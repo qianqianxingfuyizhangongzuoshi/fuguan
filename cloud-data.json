@@ -106,7 +106,37 @@
       "images": [],
       "yangsenAmount": 420,
       "yuelaiAmount": 0
+    },
+    {
+      "id": 1779879141312,
+      "type": "order",
+      "memberId": 1779879084864,
+      "date": "2026-04-17",
+      "ticket": "7057354",
+      "products": [
+        {
+          "name": "瘦瘦包",
+          "yangsenPrice": 320,
+          "yangsenQty": 1,
+          "yangsenAmount": 320,
+          "yuelaiPrice": 0,
+          "yuelaiQty": 0,
+          "yuelaiAmount": 0
+        },
+        {
+          "name": "鸸鹋油",
+          "yangsenPrice": 0,
+          "yangsenQty": 0,
+          "yangsenAmount": 0,
+          "yuelaiPrice": 174,
+          "yuelaiQty": 1,
+          "yuelaiAmount": 174
+        }
+      ],
+      "images": [],
+      "yangsenAmount": 320,
+      "yuelaiAmount": 174
     }
   ],
-  "lastModified": "2026-05-27T10:51:27.866Z"
+  "lastModified": "2026-05-27T10:52:24.314Z"
 }
