@@ -41,6 +41,20 @@
       "yuelaiTeam": "洁含",
       "yuelaiLevel": "会员价",
       "createdAt": "2026-05-27T10:51:24.864Z"
+    },
+    {
+      "id": 1779879302160,
+      "name": "孟",
+      "phone": "15232179682",
+      "address": "东田",
+      "birthday": "",
+      "yangsenTeam": "霞嫂子",
+      "yangsenLevel": "",
+      "teacher": "李倩",
+      "no": "",
+      "yuelaiTeam": "洁含",
+      "yuelaiLevel": "会员价",
+      "createdAt": "2026-05-27T10:55:02.160Z"
     }
   ],
   "records": [
@@ -159,5 +173,5 @@
       "yuelaiAmount": 0
     }
   ],
-  "lastModified": "2026-05-27T10:53:23.487Z"
+  "lastModified": "2026-05-27T10:55:05.161Z"
 }
