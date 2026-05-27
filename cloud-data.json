@@ -2,13 +2,13 @@
   "members": [
     {
       "id": 1779878398016,
-      "name": "èèè",
+      "name": "Ã¨ÂÂÃ¨ÂÂÃ¨ÂÂ",
       "phone": "15690306690",
-      "address": "è¦å­",
+      "address": "Ã¨ÂÂ¦Ã¥ÂÂ­",
       "birthday": "",
-      "yangsenTeam": "éå«å­",
-      "yangsenLevel": "5ç",
-      "teacher": "æå©",
+      "yangsenTeam": "Ã©ÂÂÃ¥Â«ÂÃ¥Â­Â",
+      "yangsenLevel": "5Ã§ÂÂ",
+      "teacher": "Ã¦ÂÂÃ¥ÂÂ©",
       "no": "",
       "yuelaiTeam": "",
       "yuelaiLevel": "",
@@ -16,13 +16,13 @@
     },
     {
       "id": 1779878683312,
-      "name": "å¼ çº¢",
+      "name": "Ã¥Â¼Â Ã§ÂºÂ¢",
       "phone": "15128137662",
-      "address": "è·¯æ±å©åä¸ææ¯æå¡ç«æ°ä¹å¸ä¸ç¯è·¯ä¸æ ç¹å¬è·¯äº¤åå£æ­£ä¸æ¹å211ç±³å·¦å³",
+      "address": "Ã¨Â·Â¯Ã¦Â±ÂÃ¥ÂÂ©Ã¥ÂÂÃ¤Â¸ÂÃ¦ÂÂÃ¦ÂÂ¯Ã¦ÂÂÃ¥ÂÂ¡Ã§Â«ÂÃ¦ÂÂ°Ã¤Â¹ÂÃ¥Â¸ÂÃ¤Â¸ÂÃ§ÂÂ¯Ã¨Â·Â¯Ã¤Â¸ÂÃ¦ÂÂ Ã§Â¹ÂÃ¥ÂÂ¬Ã¨Â·Â¯Ã¤ÂºÂ¤Ã¥ÂÂÃ¥ÂÂ£Ã¦Â­Â£Ã¤Â¸ÂÃ¦ÂÂ¹Ã¥ÂÂ211Ã§Â±Â³Ã¥Â·Â¦Ã¥ÂÂ³",
       "birthday": "",
-      "yangsenTeam": "éå«å­",
-      "yangsenLevel": "2ç®±",
-      "teacher": "æå©",
+      "yangsenTeam": "Ã©ÂÂÃ¥Â«ÂÃ¥Â­Â",
+      "yangsenLevel": "2Ã§Â®Â±",
+      "teacher": "Ã¦ÂÂÃ¥ÂÂ©",
       "no": "",
       "yuelaiTeam": "",
       "yuelaiLevel": "",
@@ -30,30 +30,30 @@
     },
     {
       "id": 1779879084864,
-      "name": "æ¬¢æ¬¢è¶å¸",
+      "name": "Ã¦Â¬Â¢Ã¦Â¬Â¢Ã¨Â¶ÂÃ¥Â¸Â",
       "phone": "11111111111",
-      "address": "å²¸å",
+      "address": "Ã¥Â²Â¸Ã¥ÂÂ",
       "birthday": "",
-      "yangsenTeam": "éå«å­",
-      "yangsenLevel": "2ç®±",
-      "teacher": "æå©",
+      "yangsenTeam": "Ã©ÂÂÃ¥Â«ÂÃ¥Â­Â",
+      "yangsenLevel": "2Ã§Â®Â±",
+      "teacher": "Ã¦ÂÂÃ¥ÂÂ©",
       "no": "",
-      "yuelaiTeam": "æ´å«",
-      "yuelaiLevel": "ä¼åä»·",
+      "yuelaiTeam": "Ã¦Â´ÂÃ¥ÂÂ«",
+      "yuelaiLevel": "Ã¤Â¼ÂÃ¥ÂÂÃ¤Â»Â·",
       "createdAt": "2026-05-27T10:51:24.864Z"
     },
     {
       "id": 1779879302160,
-      "name": "å­",
+      "name": "Ã¥Â­Â",
       "phone": "15232179682",
-      "address": "ä¸ç°",
+      "address": "Ã¤Â¸ÂÃ§ÂÂ°",
       "birthday": "",
-      "yangsenTeam": "éå«å­",
+      "yangsenTeam": "Ã©ÂÂÃ¥Â«ÂÃ¥Â­Â",
       "yangsenLevel": "",
-      "teacher": "æå©",
+      "teacher": "Ã¦ÂÂÃ¥ÂÂ©",
       "no": "",
-      "yuelaiTeam": "æ´å«",
-      "yuelaiLevel": "会员价",
+      "yuelaiTeam": "Ã¦Â´ÂÃ¥ÂÂ«",
+      "yuelaiLevel": "ä¼åä»·",
       "createdAt": "2026-05-27T10:55:02.160Z"
     }
   ],
@@ -66,7 +66,7 @@
       "ticket": "7057351",
       "products": [
         {
-          "name": "ç¦ç¦å",
+          "name": "Ã§ÂÂ¦Ã§ÂÂ¦Ã¥ÂÂ",
           "yangsenPrice": 420,
           "yangsenQty": 1,
           "yangsenAmount": 420,
@@ -87,7 +87,7 @@
       "ticket": "7057352",
       "products": [
         {
-          "name": "éµç´ æ¶²",
+          "name": "Ã©ÂÂµÃ§Â´Â Ã¦Â¶Â²",
           "yangsenPrice": 225,
           "yangsenQty": 2,
           "yangsenAmount": 450,
@@ -108,7 +108,7 @@
       "ticket": "7057352",
       "products": [
         {
-          "name": "ç¦ç¦å",
+          "name": "Ã§ÂÂ¦Ã§ÂÂ¦Ã¥ÂÂ",
           "yangsenPrice": 420,
           "yangsenQty": 1,
           "yangsenAmount": 420,
@@ -129,7 +129,7 @@
       "ticket": "7057354",
       "products": [
         {
-          "name": "ç¦ç¦å",
+          "name": "Ã§ÂÂ¦Ã§ÂÂ¦Ã¥ÂÂ",
           "yangsenPrice": 320,
           "yangsenQty": 1,
           "yangsenAmount": 320,
@@ -138,7 +138,7 @@
           "yuelaiAmount": 0
         },
         {
-          "name": "é¸¸é¹æ²¹",
+          "name": "Ã©Â¸Â¸Ã©Â¹ÂÃ¦Â²Â¹",
           "yangsenPrice": 0,
           "yangsenQty": 0,
           "yangsenAmount": 0,
@@ -159,7 +159,7 @@
       "ticket": "7057355",
       "products": [
         {
-          "name": "éµç´ æ¶²",
+          "name": "Ã©ÂÂµÃ§Â´Â Ã¦Â¶Â²",
           "yangsenPrice": 150,
           "yangsenQty": 10,
           "yangsenAmount": 1500,
@@ -171,7 +171,28 @@
       "images": [],
       "yangsenAmount": 1500,
       "yuelaiAmount": 0
+    },
+    {
+      "id": 1779881031529,
+      "type": "order",
+      "memberId": 1779879302160,
+      "date": "2026-04-19",
+      "ticket": "7057356",
+      "products": [
+        {
+          "name": "鸸鹋油",
+          "yangsenPrice": 0,
+          "yangsenQty": 0,
+          "yangsenAmount": 0,
+          "yuelaiPrice": 174,
+          "yuelaiQty": 1,
+          "yuelaiAmount": 174
+        }
+      ],
+      "images": [],
+      "yangsenAmount": 0,
+      "yuelaiAmount": 174
     }
   ],
-  "lastModified": "2026-05-27T11:22:27.871Z"
+  "lastModified": "2026-05-27T11:23:54.535Z"
 }
