@@ -27,6 +27,20 @@
       "yuelaiTeam": "",
       "yuelaiLevel": "",
       "createdAt": "2026-05-27T10:44:43.312Z"
+    },
+    {
+      "id": 1779879084864,
+      "name": "欢欢超市",
+      "phone": "11111111111",
+      "address": "岸城",
+      "birthday": "",
+      "yangsenTeam": "霞嫂子",
+      "yangsenLevel": "2箱",
+      "teacher": "李倩",
+      "no": "",
+      "yuelaiTeam": "洁含",
+      "yuelaiLevel": "会员价",
+      "createdAt": "2026-05-27T10:51:24.864Z"
     }
   ],
   "records": [
@@ -94,5 +108,5 @@
       "yuelaiAmount": 0
     }
   ],
-  "lastModified": "2026-05-27T10:49:48.371Z"
+  "lastModified": "2026-05-27T10:51:27.866Z"
 }
