@@ -2,13 +2,13 @@
   "members": [
     {
       "id": 1779878398016,
-      "name": "薛莎莎",
+      "name": "èèè",
       "phone": "15690306690",
-      "address": "芦园",
+      "address": "è¦å­",
       "birthday": "",
-      "yangsenTeam": "霞嫂子",
-      "yangsenLevel": "5盒",
-      "teacher": "李倩",
+      "yangsenTeam": "éå«å­",
+      "yangsenLevel": "5ç",
+      "teacher": "æå©",
       "no": "",
       "yuelaiTeam": "",
       "yuelaiLevel": "",
@@ -16,13 +16,13 @@
     },
     {
       "id": 1779878683312,
-      "name": "张红",
+      "name": "å¼ çº¢",
       "phone": "15128137662",
-      "address": "路江利农业技术服务站新乐市东环路与无繁公路交叉口正东方向211米左右",
+      "address": "è·¯æ±å©åä¸ææ¯æå¡ç«æ°ä¹å¸ä¸ç¯è·¯ä¸æ ç¹å¬è·¯äº¤åå£æ­£ä¸æ¹å211ç±³å·¦å³",
       "birthday": "",
-      "yangsenTeam": "霞嫂子",
-      "yangsenLevel": "2箱",
-      "teacher": "李倩",
+      "yangsenTeam": "éå«å­",
+      "yangsenLevel": "2ç®±",
+      "teacher": "æå©",
       "no": "",
       "yuelaiTeam": "",
       "yuelaiLevel": "",
@@ -30,29 +30,29 @@
     },
     {
       "id": 1779879084864,
-      "name": "欢欢超市",
+      "name": "æ¬¢æ¬¢è¶å¸",
       "phone": "11111111111",
-      "address": "岸城",
+      "address": "å²¸å",
       "birthday": "",
-      "yangsenTeam": "霞嫂子",
-      "yangsenLevel": "2箱",
-      "teacher": "李倩",
+      "yangsenTeam": "éå«å­",
+      "yangsenLevel": "2ç®±",
+      "teacher": "æå©",
       "no": "",
-      "yuelaiTeam": "洁含",
-      "yuelaiLevel": "会员价",
+      "yuelaiTeam": "æ´å«",
+      "yuelaiLevel": "ä¼åä»·",
       "createdAt": "2026-05-27T10:51:24.864Z"
     },
     {
       "id": 1779879302160,
-      "name": "孟",
+      "name": "å­",
       "phone": "15232179682",
-      "address": "东田",
+      "address": "ä¸ç°",
       "birthday": "",
-      "yangsenTeam": "霞嫂子",
+      "yangsenTeam": "éå«å­",
       "yangsenLevel": "",
-      "teacher": "李倩",
+      "teacher": "æå©",
       "no": "",
-      "yuelaiTeam": "洁含",
+      "yuelaiTeam": "æ´å«",
       "yuelaiLevel": "会员价",
       "createdAt": "2026-05-27T10:55:02.160Z"
     }
@@ -66,7 +66,7 @@
       "ticket": "7057351",
       "products": [
         {
-          "name": "瘦瘦包",
+          "name": "ç¦ç¦å",
           "yangsenPrice": 420,
           "yangsenQty": 1,
           "yangsenAmount": 420,
@@ -87,7 +87,7 @@
       "ticket": "7057352",
       "products": [
         {
-          "name": "酵素液",
+          "name": "éµç´ æ¶²",
           "yangsenPrice": 225,
           "yangsenQty": 2,
           "yangsenAmount": 450,
@@ -108,7 +108,7 @@
       "ticket": "7057352",
       "products": [
         {
-          "name": "瘦瘦包",
+          "name": "ç¦ç¦å",
           "yangsenPrice": 420,
           "yangsenQty": 1,
           "yangsenAmount": 420,
@@ -129,7 +129,7 @@
       "ticket": "7057354",
       "products": [
         {
-          "name": "瘦瘦包",
+          "name": "ç¦ç¦å",
           "yangsenPrice": 320,
           "yangsenQty": 1,
           "yangsenAmount": 320,
@@ -138,7 +138,7 @@
           "yuelaiAmount": 0
         },
         {
-          "name": "鸸鹋油",
+          "name": "é¸¸é¹æ²¹",
           "yangsenPrice": 0,
           "yangsenQty": 0,
           "yangsenAmount": 0,
@@ -159,7 +159,7 @@
       "ticket": "7057355",
       "products": [
         {
-          "name": "酵素液",
+          "name": "éµç´ æ¶²",
           "yangsenPrice": 150,
           "yangsenQty": 10,
           "yangsenAmount": 1500,
@@ -173,5 +173,5 @@
       "yuelaiAmount": 0
     }
   ],
-  "lastModified": "2026-05-27T10:55:05.161Z"
+  "lastModified": "2026-05-27T11:22:27.871Z"
 }
